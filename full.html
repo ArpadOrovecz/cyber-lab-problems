@@ -17,7 +17,7 @@ html,body{margin:0;height:100%;overflow:hidden;background:var(--paper);color:var
 svg text{font-family:var(--hand)}
 .mono{font-family:var(--mono)}
 #cv *{cursor:inherit}
-.go:hover>path,.jump:hover>path{filter:drop-shadow(0 0 3px rgba(25,113,194,.45))}
+.jump:hover>path{filter:drop-shadow(0 0 3px rgba(25,113,194,.45))}
 text.term,tspan.term{text-decoration:underline dotted;fill:#1864ab}
 #hov{fill:rgba(25,113,194,.07);stroke:#1971c2;stroke-width:4;stroke-linejoin:round}
 #sel{fill:none;stroke:#1971c2;stroke-width:3;stroke-dasharray:10 6;opacity:.75}
@@ -371,7 +371,7 @@ const TREE={id:'lab',title:'My lab',kind:'place',frame:{L:[1500,990],P:[800,2200
    {id:'r6',title:'The result',note:{text:"In one visit a teacher sees the attack work on the vulnerable login and fail on the secure one, while a real user can log in on both.",sees:"I tested it from Kali inside the lab, and again from outside through the permanent link. During that test real logins suddenly failed on both versions, while the attack still worked. On my laptop the same file worked, so the code was fine. The attack needs no correct username, but a real login does, so the username had to be the difference. Copying it from my test instructions into the login box had put an invisible space in front of it. Typing it by hand fixed it: a slip in my test, not a flaw in either version."}}]),
  chal(3,'c3','Copy-paste','Challenge 3 · Getting text into the lab machines','A console is the built-in screen of a virtual machine, opened in a browser window.',[[100,682],[335,1612]],{},
   {text:"This affected every machine in the lab. It slowed down every other challenge until I solved it."},
-  [{id:'p7',title:'The problem',note:{text:"The lab machines' {consoles|console} did not accept paste. Every configuration file and every long command had to be typed by hand, and one typo could cost a long search.",exCtx:"What I wrote to Grok when it happened. “It” is the console window; Gemini is another AI assistant I had asked first.",ex:[['Me','yeah, next problem I cannot paste into it. Gemini coulnt fix it either']]}},
+  [{id:'p7',title:'The problem',note:{text:"The lab machines' {consoles|console} did not accept paste. Every configuration file and every long command had to be typed by hand, and one typo could cost a long search.",exCtx:"What I wrote to Grok when it happened. “It” is the console window; Gemini is another AI assistant I had asked first.",ex:[['Me','yeah, next problem I cannot paste into it. Gemini couldn’t fix it either']]}},
    {id:'f7',title:'The fix: type commands from my own computer',note:{text:"In GNS3 I added two “Cloud” nodes that connect the EduCloud server to both lab networks. From the EduCloud server I can now reach every machine with {SSH|ssh}, a remote terminal where copy and paste work normally. Files go from my laptop to the EduCloud server and from there into the lab. The box at the bottom shows why SSH did not work at first: my first try from the school server was refused, because the lab networks are kept separate inside GNS3 and the school server was on neither of them. The two Cloud nodes put it on both networks, and only then did SSH, and with it paste, work."}},
    {id:'r7',title:'The result',note:{text:"Long commands and whole files now go in within seconds, on every machine in the lab."}}]),
  chal(1,'c1','Address plan','Challenge 1 · A fixed address plan','An IP address is a computer\'s number on a network. Every machine here has a fixed one.',[[75,226],[110,792]],{},
@@ -403,15 +403,18 @@ const SPEC={L:{
  c8:{r:[1080,410,135]}},
  P:{
  c1:{r:[360,1215,24],knot:[372,1193]},
- c2:{r:[600,950,66]},
- c3:{r:[140,1975,62]},
+ c2:{r:[606,992,92]},
+ c3:{r:[128,2014,86]},
  c4:{r:[248,1146,14]},
  c5:{r:[580,750,40],hook:[[586,0],[614,0]]},
  c6:{r:[616,1312,34]},
- c7:{r:[389,185,62]},
+ c7:{r:[377,224,86]},
  c8:{r:[389,437,62]}}};
-function pr(id,o){const r=SPEC[o][id].r,p=PAPF[o];return {x:r[0],y:r[1],w:r[2],h:r[2]*(p[3]-p[1])/(p[2]-p[0])}}
-function boxFor(id,o){const r=SPEC[o][id].r,p=PAPF[o],sc=r[2]/(p[2]-p[0]);return [r[0]-p[0]*sc,r[1]-p[1]*sc,1360*sc]}
+/* on a phone, screens and laptops keep their normal landscape shape */
+function papf(id,o){return o=='P'&&(STY[id]=='screen'||STY[id]=='laptop')?[-130,-40,1490,1150]:PAPF[o]}
+const OBJN={c1:'Tag on the cables',c2:'Web server screen',c3:'My own laptop',c4:'Firewall wall',c5:'Tunnel label',c6:'Database',c7:"Teacher's laptop",c8:'Link page'};
+function pr(id,o){const r=SPEC[o][id].r,p=papf(id,o);return {x:r[0],y:r[1],w:r[2],h:r[2]*(p[3]-p[1])/(p[2]-p[0])}}
+function boxFor(id,o){const r=SPEC[o][id].r,p=papf(id,o),sc=r[2]/(p[2]-p[0]);return [r[0]-p[0]*sc,r[1]-p[1]*sc,1360*sc]}
 TREE.kids.forEach(c=>c.box={L:boxFor(c.id,'L'),P:boxFor(c.id,'P')});
 // tunnel curves (world units); hooks of the hanging label sit on them
 const TUN={L:[[851,255],[965,335],[1068,250]],P:[[640,943],[720,760],[538,712]]};
@@ -450,17 +453,17 @@ function deco(id,o,X,Y,W,H){const s=STY[id],u=Math.min(W,H)/100,ink='#1e1e1e';le
  if(s=='sticker'){const k=W*.06;b+=pth(`M${q2(X+W-k*1.2)} ${q2(Y+H)}L${q2(X+W+k*.35)} ${q2(Y+H+k*.55)}L${q2(X+W)} ${q2(Y+H-k*1.1)}Z`,'#e9ecef','#868e96',W*.008)}
  return [b,f]}
 function paperStroke(id){return {notice:['#6b6455',.004],hang:['#5c5647',.008],sticker:['#9775fa',.01],page:['#adb5bd',.004],screen:['#212529',.006],laptop:['#495057',.006],tag:['#b08a3e',.012]}[STY[id]]}
-function topDecor(o){const P=o=='P';let s=netDecor(o);
- const B={L:{c1:[648,513],c2:[674,206],c3:[996,778],c4:[517,452],c5:[922,338],c6:[840,555],c7:[1074,550],c8:[1064,390]},
-  P:{c1:[400,1225],c2:[582,935],c3:[120,1965],c4:[284,1140],c5:[640,770],c6:[680,1300],c7:[368,175],c8:[368,420]}}[o];
+function topDecor(o){const P=o=='P';let s=netDecor(o);const up=[];s=s.replace(/<text[\s\S]*?<\/text>/g,m=>{up.push(m);return ''});
+ const B={L:{c1:[651,497],c2:[696,196],c3:[1160,798],c4:[567,471],c5:[922,303],c6:[840,518],c7:[1240,568],c8:[1061,409]},
+  P:{c1:[411,1205],c2:[723,1005],c3:[94,2028],c4:[341,1163],c5:[646,745],c6:[684,1305],c7:[343,238],c8:[367,442]}}[o];
  const H={L:{c1:['line',552,504,640,474],c4:['rect',378,458,172,118],c5:['tun'],c6:['rect',711,505,112,125]},
   P:{c1:['line',322,1204,420,1184],c4:['rect',148,1148,172,118],c5:['tun'],c6:['rect',603,1288,60,125]}}[o];
  const t=TUN[o];
  for(const id in H){const h=H[id],c=BY[id];
   const hs=h[0]=='rect'?`<rect x="${h[1]}" y="${h[2]}" width="${h[3]}" height="${h[4]}" fill="#fff" fill-opacity=".001"/>`:h[0]=='line'?`<path d="M${h[1]} ${h[2]}L${h[3]} ${h[4]}" stroke="#fff" stroke-opacity=".001" stroke-width="30" fill="none"/>`:`<path d="M${t[0][0]} ${t[0][1]}Q${t[1][0]} ${t[1][1]} ${t[2][0]} ${t[2][1]}" stroke="#fff" stroke-opacity=".001" stroke-width="30" fill="none"/>`;
-  s+=`<g class="go" data-go="${id}" data-name="${c.title}">${hs}</g>`}
- for(const id in B){const q=B[id],R=P?17:13;s+=`<g class="go" data-go="${id}" data-name="${BY[id].title}">`+ell(q[0],q[1],R,R,{fill:C.blue,fo:1,c:C.blue,w:2})+T(q[0],q[1]+R*.42,String(BY[id].num),{s:R*1.2,a:'middle',c:'#fff',b:1})+`</g>`}
- return s}
+  s+=`<g class="go ohit" data-go="${id}" data-name="${c.title}">${hs}</g>`}
+ for(const id in B){const q=B[id],R=P?17:13;up.push(`<g class="go badge" data-go="${id}" data-name="${BY[id].title}">`+ell(q[0],q[1],R,R,{fill:C.blue,fo:1,c:C.blue,w:2})+T(q[0],q[1]+R*.42,String(BY[id].num),{s:R*1.2,a:'middle',c:'#fff',b:1})+`</g>`)}
+ TREE.up=up.join('');return s}
 
 function cylinder(cx,top,rx,ry,h,w){return `<path d="M${cx-rx} ${top}V${top+h}Q${cx} ${top+h+ry*2.2} ${cx+rx} ${top+h}V${top}" fill="${C.lav}" fill-opacity=".55" stroke="#1e1e1e" stroke-width="${w}" stroke-linejoin="round"/>`+ell(cx,top,rx,ry,{fill:'#e5dbff',fo:1,w:w})}
 function tunnel(o,w,dash){const t=TUN[o];return curve(`M${t[0][0]} ${t[0][1]}Q${t[1][0]} ${t[1][1]} ${t[2][0]} ${t[2][1]}`,C.green,w,dash)}
@@ -512,7 +515,7 @@ const oF=n=>n===TREE?O:'L',oB=n=>n.parent===TREE?O:'L';
 function fr(n){return n.frame?n.frame[oF(n)]:[1000,625]}
 function bx(n){const b=n.box[oB(n)],f=fr(n);return {x:b[0],y:b[1],w:b[2],h:b[2]*f[1]/f[0]}}
 let NOZB=false;const _zb=zoneBox;zoneBox=function(k){return NOZB?'':_zb(k)};
-function renderFrame(n){let s=n.decor?n.decor(oF(n)):'';(n.kids||[]).forEach(k=>s+=renderNode(k));return s}
+function renderFrame(n){let s=n.decor?n.decor(oF(n)):'';(n.kids||[]).forEach(k=>s+=renderNode(k));/* names, descriptions and number badges sit above every object */return s+(n.up?`<g class="up">${n.up}</g>`:'')}
 /* level of detail: a node's own fine drawing (.in) fades in as the node grows on screen; its outline/panel (.sk) and, for challenges, its zones stay */
 const LOD={story:[260,460],problem:[70,150],fix:[70,150],result:[70,150]},LODd=[110,220];
 function renderNode(k){const b=bx(k),f=fr(k),sc=b.w/f[0];seed=k.id.length*977+Math.round(b.x)+7;k.lod=LOD[k.kind]&&!k.deep?LOD[k.kind]:LODd;
@@ -547,14 +550,14 @@ const sm=t=>t<=0?0:t>=1?1:t*t*(3-2*t);
 function outl(el,n,pad){if(!n||!n.parent){el.setAttribute('d','');return}if(n.rr){const A=n.A,pw=pad/cam.k,c=corners({x:A.x-pw,y:A.y-pw,w:A.w+2*pw,h:A.h+2*pw}).map(p=>rv(n.rr,p)).map(p=>[(p[0]-cam.x)*cam.k,(p[1]-cam.y)*cam.k]),f=v=>Math.round(v*10)/10;el.setAttribute('d','M'+c.map(p=>f(p[0])+' '+f(p[1])).join('L')+'Z');return}const A=n.A,K=cam.k,x=(A.x-cam.x)*K-pad,y=(A.y-cam.y)*K-pad,w=A.w*K+2*pad,h=A.h*K+2*pad,f=v=>Math.round(v*10)/10;el.setAttribute('d',`M${f(x)} ${f(y)}h${f(w)}v${f(h)}h${f(-w)}Z`)}
 /* each challenge's paper (sheet, screen, tag...) covers the whole screen when the challenge fills it; the object around it is drawn just outside */
 function paper(){const q=v=>Math.round(v*100)/100,$=id=>document.getElementById(id);
- for(const id in STY){const r=BY[id];if(!r||!r.g)continue;const f=fr(r),A=r.A,sc=A.w/f[0];let [x0,y0,x1,y1]=PAPF[O];
-  for(const nc of [false,true]){NCF=nc;FK=new Map();const c=camFor(r),a=(c.x-A.x)/sc,b=(c.y-A.y)/sc,w=VW/c.k/sc,h=VH/c.k/sc,m=.012*w;x0=Math.min(x0,a-m);y0=Math.min(y0,b-m);x1=Math.max(x1,a+w+m);y1=Math.max(y1,b+h+m)}NCF=null;FK=new Map();
+ for(const id in STY){const r=BY[id];if(!r||!r.g)continue;const f=fr(r),A=r.A,sc=A.w/f[0];let [x0,y0,x1,y1]=papf(id,O);
+  for(const nc of (papf(id,O)!==PAPF[O]?[]:[false,true])){NCF=nc;FK=new Map();const c=camFor(r),a=(c.x-A.x)/sc,b=(c.y-A.y)/sc,w=VW/c.k/sc,h=VH/c.k/sc,m=.012*w;x0=Math.min(x0,a-m);y0=Math.min(y0,b-m);x1=Math.max(x1,a+w+m);y1=Math.max(y1,b+h+m)}NCF=null;FK=new Map();
   const P=$('pp-'+id),st=paperStroke(id);P.setAttribute('x',q(x0));P.setAttribute('y',q(y0));P.setAttribute('width',q(x1-x0));P.setAttribute('height',q(y1-y0));P.setAttribute('rx',q((x1-x0)*.006));P.setAttribute('stroke',st[0]);P.setAttribute('stroke-width',q(st[1]*(x1-x0)));
   seed=id.charCodeAt(1)*131+7;const d=deco(id,O,A.x+x0*sc,A.y+y0*sc,(x1-x0)*sc,(y1-y0)*sc),tr=`scale(${1/sc}) translate(${-A.x} ${-A.y})`;
   $('bk-'+id).innerHTML=`<g transform="${tr}">${d[0]}</g>`;$('fr-'+id).innerHTML=`<g transform="${tr}">${d[1]}</g>`}}
 function tilt(){const k0=fitK(TREE);for(const id in ROTS){const r=BY[id];if(!r||!r.g)continue;const k1=fitK(r);let p=Math.log(cam.k/k0)/Math.log(k1/k0);p=Math.max(0,Math.min(1,p));p=p*p*(3-2*p);const d=ROTS[id]*(1-p);if(Math.abs(d-r.RD)<1e-4&&r.RB)continue;r.RD=d;r.RCS=Math.cos(d*Math.PI/180);r.RSN=Math.sin(d*Math.PI/180);
  if(!r.RB)r.RB=r.g.getAttribute('transform').replace(/^rotate\([^)]*\)\s*/,'');r.g.setAttribute('transform',`rotate(${Math.round(d*1e4)/1e4} ${r.RC[0]} ${r.RC[1]}) `+r.RB)}}
-function apply(){const k=cam.k;tilt();world.setAttribute('transform',`matrix(${k} 0 0 ${k} ${-cam.x*k} ${-cam.y*k})`);cull();mask();outl(selEl,cur,4);if(!outlObj())outl(hovEl,hovN,2);if(!flying)autoCur()}
+function apply(){const k=cam.k;tilt();world.setAttribute('transform',`matrix(${k} 0 0 ${k} ${-cam.x*k} ${-cam.y*k})`);cull();mask();selEl.setAttribute('d','');drawHov();if(!flying)autoCur()}
 function cull(){const k=cam.k;for(const n of NODES){const A=n.A,sx=(A.x-cam.x)*k,sy=(A.y-cam.y)*k,sw=A.w*k,sh=A.h*k;
  /* demo2: no off-screen culling either */
  /* demo2: no level-of-detail fades: everything is always drawn */
@@ -576,7 +579,13 @@ function interp(p0,p1){const rho=1.4,r2=rho*rho,r4=r2*r2,[ux0,uy0,w0]=p0,[ux1,uy
  else{const d1=Math.sqrt(d2),b0=(w1*w1-w0*w0+r4*d2)/(2*w0*r2*d1),b1=(w1*w1-w0*w0-r4*d2)/(2*w1*r2*d1),q0=Math.log(Math.sqrt(b0*b0+1)-b0),q1=Math.log(Math.sqrt(b1*b1+1)-b1);S=(q1-q0)/rho;
   f=t=>{const s=t*S,c0=Math.cosh(q0),u=w0/(r2*d1)*(c0*Math.tanh(rho*s+q0)-Math.sinh(q0));return [ux0+u*dx,uy0+u*dy,w0*c0/Math.cosh(rho*s+q0)]}}
  f.S=Math.abs(S);return f}
-function fly(n,dur){if(!n)return;hide();setCur(n);const F=fitArea(),fx=F.x+F.w/2,fy=F.y+F.h/2,b=camFor(n);cancelAnimationFrame(anim);
+function fly(n,dur){if(!n)return;hide();setCur(n);flyCam(camFor(n),dur)}
+/* object level: the whole object (screen with its stand, wall, database...) fills the screen; still the lab level */
+function flyObj(n){hide();if(cur!==TREE)setCur(TREE);const F=fitArea(),c0={...cam},put=c=>{cam.x=c.x;cam.y=c.y;cam.k=c.k;tilt();world.setAttribute('transform',`matrix(${c.k} 0 0 ${c.k} ${-c.x*c.k} ${-c.y*c.k})`)};
+ /* the tilted pictures straighten as you zoom, so measure the object as it will look at the end */
+ let b=null;for(let i=0;i<4;i++){const R=objRect(n,1),k=Math.min(F.w/(R.w*1.1),F.h/(R.h*1.1));b={k,x:R.x+R.w/2-(F.x+F.w/2)/k,y:R.y+R.h/2-(F.y+F.h/2)/k};put(b)}
+ put(c0);flyCam(b)}
+function flyCam(b,dur){const F=fitArea(),fx=F.x+F.w/2,fy=F.y+F.h/2;cancelAnimationFrame(anim);
  const f=interp([cam.x+fx/cam.k,cam.y+fy/cam.k,F.w/cam.k],[b.x+fx/b.k,b.y+fy/b.k,F.w/b.k]);const D=dur||Math.max(450,Math.min(1500,f.S*520)),t0=performance.now();flying=true;
  const step=now=>{const t=Math.min(1,(now-t0)/D),e=t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2,p=f(e),k=F.w/p[2];cam={k,x:p[0]-fx/k,y:p[1]-fy/k};apply();
   if(t<1)anim=requestAnimationFrame(step);else{cam=b;apply();flying=false}};anim=requestAnimationFrame(step)}
@@ -617,23 +626,34 @@ svg.addEventListener('pointermove',e=>{if(!ptr.size&&e.pointerType=='mouse'&&!fl
   if(dragged){cam.x=start[2]-dx/cam.k;cam.y=start[3]-dy/cam.k;clampPan();apply()}}});
 function chainAt(WX,WY){const ch=[TREE];let c=TREE;for(;;){const k=(c.kids||[]).find(n=>{const A=n.A;const [wx,wy]=n.rr?ri(n.rr,[WX,WY]):[WX,WY];return wx>=A.x&&wx<=A.x+A.w&&wy>=A.y&&wy<=A.y+A.h});if(!k)break;ch.push(k);c=k}return ch}
 function isAnc(a,b){for(let p=b;p;p=p.parent)if(p===a)return true;return false}
-function targetAt(x,y){if(HOLE&&(x<HOLE[0]||y<HOLE[1]||x>HOLE[0]+HOLE[2]||y>HOLE[1]+HOLE[3]))return null;/* faded paper: only drag */
+function targetAt(x,y){if(HOLE&&(x<HOLE[0]||y<HOLE[1]||x>HOLE[0]+HOLE[2]||y>HOLE[1]+HOLE[3]))return null;
  const el=document.elementFromPoint(x,y);if(!el||!svg.contains(el))return null;
  const tm=el.closest('.term');if(tm&&tm.getBoundingClientRect().height>=8)return {term:tm};
- const j=el.closest('.jump,.go');if(j&&!(j.classList.contains('obj')&&isAnc(BY[j.dataset.go],cur))){const r=j.getBoundingClientRect();if(r.height>=(j.classList.contains('jump')?14:10)&&BY[j.dataset.go])return {nav:BY[j.dataset.go],el:j.classList.contains('go')?j:null}}
+ const j=el.closest('.jump,.go');
+ if(j&&j.classList.contains('jump')){if(j.getBoundingClientRect().height>=14&&BY[j.dataset.go])return {nav:BY[j.dataset.go]}}
+ else if(j){const n=BY[j.dataset.go];if(n&&!isAnc(n,cur)){if(j.classList.contains('lbl'))return j.getBoundingClientRect().height>=10?{unit:n}:null;if(j.classList.contains('badge')||el.id==='pp-'+n.id)return {pic:n};return {obj:n}}}
  const ch=chainAt(cam.x+x/cam.k,cam.y+y/cam.k);let i=0;while(i<ch.length&&isAnc(ch[i],cur))i++;const t=ch[i];if(!t)return null;
+ if(t.parent===TREE&&STY[t.id])return {pic:t};
  const sw=t.A.w*cam.k;return sw>=6?{unit:t}:null}
-function clickAt(x,y){const t=targetAt(x,y);setHover(null);if(!t)return;if(t.term)return setTimeout(()=>showTip(t.term),0);if(t.nav)return fly(t.nav);
+/* world rect of a whole object: its picture and frame, plus the wall / database it is on; the tag and the hanging label get some room around */
+function objRect(n,fill){const q=[`#bk-${n.id}`,`#pp-${n.id}`,`#fr-${n.id}`];if(n.id=='c4'||n.id=='c6')q.push(`.ohit[data-go="${n.id}"]`);
+ let x0=1e9,y0=1e9,x1=-1e9,y1=-1e9;q.forEach(s=>{const e=world.querySelector(s);if(!e)return;const r=e.getBoundingClientRect();if(!r.width)return;x0=Math.min(x0,r.left);y0=Math.min(y0,r.top);x1=Math.max(x1,r.right);y1=Math.max(y1,r.bottom)});
+ let R={x:cam.x+x0/cam.k,y:cam.y+y0/cam.k,w:(x1-x0)/cam.k,h:(y1-y0)/cam.k};const g=fill&&{c1:1.8,c5:1.2}[n.id];if(g)R={x:R.x-R.w*(g-1)/2,y:R.y-R.h*(g-1)/2,w:R.w*g,h:R.h*g};return R}
+function picPoly(n){const P=document.getElementById('pp-'+n.id),A=n.A,s=A.w/fr(n)[0],a=['x','y','width','height'].map(k=>+P.getAttribute(k));
+ let c=corners({x:A.x+a[0]*s,y:A.y+a[1]*s,w:a[2]*s,h:a[3]*s});if(n.rr)c=c.map(p=>rv(n.rr,p));return c.map(p=>[(p[0]-cam.x)*cam.k,(p[1]-cam.y)*cam.k])}
+let hovT=null;
+/* exactly one highlight: the object, the picture as one unit, or one zone */
+function drawHov(){const t=hovT;if(!t){hovEl.setAttribute('d','');return}
+ if(t.obj){const R=objRect(t.obj,1),p=6,K=cam.k,x=(R.x-cam.x)*K-p,y=(R.y-cam.y)*K-p,w=R.w*K+2*p,h=R.h*K+2*p;hovEl.setAttribute('d',`M${f1(x)} ${f1(y)}h${f1(w)}v${f1(h)}h${f1(-w)}Z`);return}
+ if(t.pic){const c=picPoly(t.pic);hovEl.setAttribute('d','M'+c.map(p=>f1(p[0])+' '+f1(p[1])).join('L')+'Z');return}
+ if(t.unit){outl(hovEl,t.unit,2);return}hovEl.setAttribute('d','')}
+function clickAt(x,y){const t=targetAt(x,y);setHover(null);if(!t)return;if(t.term)return setTimeout(()=>showTip(t.term),0);if(t.nav)return fly(t.nav);if(t.obj)return flyObj(t.obj);if(t.pic)return fly(t.pic);
  if(collapsed()){document.body.classList.remove('nc');try{localStorage.setItem('labNoteHidden','0')}catch(e){}FK=new Map()}fly(t.unit)}
 const kindWord={story:'challenge',problem:'problem',fix:'fix',result:'result'};
-let hovObj=null;
-function outlObj(){if(!hovObj){return false}const r=hovObj.getBoundingClientRect(),p=6,f=v=>Math.round(v*10)/10;hovEl.setAttribute('d',`M${f(r.left-p)} ${f(r.top-p)}h${f(r.width+2*p)}v${f(r.height+2*p)}h${f(-r.width-2*p)}Z`);return true}
-function setHover(t,x,y){const ob=t&&t.el||null;const n=ob?null:(t&&t.unit||null);svg.style.cursor=!t?'grab':t.term?'help':ob?'zoom-in':t.nav?'pointer':'zoom-in';
- if(ob!==hovObj){hovObj=ob;if(ob){hovN=null;outlObj()}else outl(hovEl,null,2)}
- if(!ob&&n!==hovN){hovN=n;outl(hovEl,hovN,2)}
- if(ob&&hov){hovTip.textContent=ob.dataset.name+': click or scroll to zoom in';hovTip.style.display='block';const tw=hovTip.offsetWidth;hovTip.style.left=Math.min(x+16,VW-tw-6)+'px';hovTip.style.top=Math.min(y+20,VH-30)+'px'}
- else if(n&&hov){const w=kindWord[n.kind]||'drawing';hovTip.textContent=n.parent===TREE?n.title+': click or scroll to zoom in':'Click: zoom into this '+w+' and read it in the note';hovTip.style.display='block';
-  const tw=hovTip.offsetWidth;hovTip.style.left=Math.min(x+16,VW-tw-6)+'px';hovTip.style.top=Math.min(y+20,VH-30)+'px'}else hovTip.style.display='none'}
+function setHover(t,x,y){t=t&&(t.obj||t.pic||t.unit)?t:t&&(t.term||t.nav)?{cur:t.term?'help':'pointer'}:null;svg.style.cursor=!t?'grab':t.cur||'zoom-in';
+ hovT=t&&!t.cur?t:null;drawHov();
+ const msg=!hovT?'':hovT.obj?OBJN[hovT.obj.id]+': click to zoom in':hovT.pic?hovT.pic.title+': click or scroll to zoom in':hovT.unit.parent===TREE?hovT.unit.title+': click or scroll to zoom in':'Click: zoom into this '+(kindWord[hovT.unit.kind]||'drawing')+' and read it in the note';
+ if(msg&&hov){hovTip.textContent=msg;hovTip.style.display='block';const tw=hovTip.offsetWidth;hovTip.style.left=Math.min(x+16,VW-tw-6)+'px';hovTip.style.top=Math.min(y+20,VH-30)+'px'}else hovTip.style.display='none'}
 function end(e){if(!ptr.has(e.pointerId))return;ptr.delete(e.pointerId);svg.classList.remove('drag');
  if(ptr.size==0){if(!dragged&&e.type=='pointerup')clickAt(e.clientX,e.clientY);pinch=null;start=null}
  else if(ptr.size==1){const p=[...ptr.values()][0];start=[p[0],p[1],cam.x,cam.y];pinch=null}}
@@ -659,6 +679,6 @@ let rt=null;addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(()=>{c
 try{if(localStorage.getItem('labNoteHidden')=='1')document.body.classList.add('nc')}catch(e){}
 setTimeout(hide,9000);build();if(VW<=720)noteEl.classList.add('min');setCur(TREE);cam=camFor(TREE);apply();
 {const h0=location.hash.slice(1);if(BY[h0]&&h0!='lab'){hide();setCur(BY[h0]);cam=camFor(BY[h0]);flying=true;apply();flying=false}}
-window.__lab={cur:()=>cur.id,cam:()=>({...cam}),flying:()=>flying,fly:id=>fly(BY[id]),abs:id=>BY[id].A,mask:()=>+(maskEl.getAttribute("opacity")||0)*(maskEl.getAttribute("d")?1:0),kids:id=>(BY[id].kids||[]).map(k=>k.id)};
+window.__lab={cur:()=>cur.id,cam:()=>({...cam}),flying:()=>flying,fly:id=>fly(BY[id]),abs:id=>BY[id].A,mask:()=>+(maskEl.getAttribute("opacity")||0)*(maskEl.getAttribute("d")?1:0),kids:id=>(BY[id].kids||[]).map(k=>k.id),target:(x,y)=>{const t=targetAt(x,y);return !t?null:t.obj?'obj:'+t.obj.id:t.pic?'pic:'+t.pic.id:t.unit?'unit:'+t.unit.id:t.term?'term':'nav'},objRect:(id,f)=>objRect(BY[id],f),fa:()=>fitArea(),pan:(x,y)=>{cam.x+=x/cam.k;cam.y+=y/cam.k;apply()},hov:()=>hovT?(hovT.obj?'obj:'+hovT.obj.id:hovT.pic?'pic:'+hovT.pic.id:'unit:'+hovT.unit.id):null};
 
 </script></body></html>
