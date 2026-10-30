@@ -10,7 +10,7 @@
 :root{--ink:#1e1e1e;--paper:#fbfaf5;--red:#e03131;--green:#2f9e44;--blue:#1971c2;--orange:#f08c00;--hand:Hand,"Segoe Print","Comic Sans MS","Chalkboard SE","Marker Felt",cursive;--mono:ui-monospace,Consolas,"DejaVu Sans Mono",monospace}
 *{box-sizing:border-box}
 html,body{margin:0;height:100%;overflow:hidden;background:var(--paper);color:var(--ink);font-family:var(--hand);-webkit-tap-highlight-color:transparent}
-#cv,#bar,#hint,#notetab{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+#cv,#bar,#notetab{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
 #cv{position:fixed;inset:0;width:100vw;height:100vh;touch-action:none;cursor:grab;display:block;background-color:var(--paper);background-image:radial-gradient(#d9d5c7 1.2px,transparent 1.3px);background-size:26px 26px}
 #cv.drag,#cv.drag *{cursor:grabbing!important}
 #world{will-change:transform}
@@ -52,9 +52,9 @@ body.nc #note{display:none}body.nc #notetab{display:block}
 .term{border-bottom:2.5px dotted var(--blue);cursor:help;color:#0b4f8a}
 #tip{position:fixed;z-index:9;max-width:280px;background:#fff;border:2.5px solid var(--blue);border-radius:10px 14px 9px 13px;padding:8px 11px;font-size:16px;line-height:1.3;box-shadow:3px 4px 0 rgba(25,113,194,.25);display:none}
 #tip b{color:var(--blue)}
-#hint{position:fixed;left:50%;top:64px;transform:translateX(-50%) rotate(-1deg);background:#fff;border:2.5px solid var(--ink);border-radius:14px 10px 16px 9px;padding:8px 14px;font-size:18px;z-index:6;box-shadow:4px 4px 0 rgba(0,0,0,.15);text-align:center;transition:opacity .5s;max-width:92vw}
-#hint.gone{opacity:0;pointer-events:none}
-#hint kbd{font:13px var(--mono);border:1.5px solid #888;border-radius:4px;padding:0 4px}
+
+
+
 @media (max-width:720px){
  .btn{font-size:15px;padding:5px 9px}
  #home .t,#up .t{display:none}
@@ -66,7 +66,7 @@ body.nc #note{display:none}body.nc #notetab{display:block}
  #note.min .body>p:first-child{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
  #note .tog{display:inline-block;font:700 13px var(--hand);border:2px solid #d8c84a;background:#fff;border-radius:8px;padding:1px 8px;cursor:pointer;white-space:nowrap;color:#6b6450}
  #notetab{right:8px;bottom:8px}
- #hint{font-size:15px;top:auto;bottom:150px}
+ 
 }
 </style></head>
 <body>
@@ -76,7 +76,7 @@ body.nc #note{display:none}body.nc #notetab{display:block}
  <button class="btn" id="up" title="Zoom out one level (Esc)" aria-label="Zoom out">−<span class="t"> Zoom out</span></button>
  <div id="crumbs"></div>
 </div>
-<div id="hint">👆 <b>Click any part of a picture to zoom in and read about it</b> · scroll or pinch to zoom · drag to move · <kbd>Esc</kbd> zooms out</div>
+
 <div id="note"></div>
 <button class="btn" id="notetab" title="Show the explanation">✎ Show notes</button>
 <div id="tip"></div><div id="hovtip"></div>
@@ -107,6 +107,9 @@ function arrow(x1,y1,x2,y2,o={}){const a=Math.atan2(y2-y1,x2-x1),h=o.h||22;
 function T(x,y,str,o={}){const lines=String(str).split('\n'),fs=o.s||30,lh=o.lh||1.18;
  return `<text x="${x}" y="${y}" font-size="${fs}" fill="${o.c||'#1e1e1e'}" text-anchor="${o.a||'start'}" ${o.b?'font-weight="700"':''} ${o.term?`class="term" data-k="${o.term}"`:o.mono?'class="mono"':''} ${o.op?`opacity="${o.op}"`:''} ${o.deco?`text-decoration="${o.deco}"`:''}>`+
  lines.map((l,i)=>`<tspan x="${x}" dy="${i?fs*lh:0}">${esc(l)}</tspan>`).join('')+`</text>`}
+function NL(x,y,name,prod,key,desc,o={}){const B=o.s||21,S=o.ss||17,a=o.a||'start';
+ let s=`<text x="${x}" y="${y}" font-size="${B}" fill="#1e1e1e" text-anchor="${a}" font-weight="700">${esc(name)}`+(prod?` <tspan class="term" data-k="${key}" font-size="${Math.round(B*.85)}" fill="#495057">(${esc(prod)})</tspan>`:'')+`</text>`;
+ return s+(desc?T(x,y+B*.5+S+2,desc,{s:S,a,c:'#495057'}):'')}
 function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
 function tick(x,y,s,c){return poly([[x-s*.5,y],[x-s*.1,y+s*.4],[x+s*.6,y-s*.5]],{c:c||'#2f9e44',w:s*.18})}
 function cross(x,y,s,c){return line(x-s/2,y-s/2,x+s/2,y+s/2,{c:c||'#e03131',w:s*.18})+line(x+s/2,y-s/2,x-s/2,y+s/2,{c:c||'#e03131',w:s*.18})}
@@ -165,19 +168,19 @@ function lab(x,y,w,h,txt){return rect(x,y,w,h,{fill:'#e7f5ff',fo:.4,c:C.blue,w:3
 function pill(x,y,txt,fs){fs=fs||22;const w=txt.length*fs*.6+24;return rect(x,y-fs*1.2,w,fs*1.75,{fill:C.yel,fo:1,c:C.orange,w:3})+T(x+12,y,txt,{s:fs,mono:1,c:C.red,b:1})}
 function env2(x,y,w,h,c,txt){return rect(x,y,w,h,{fill:'#fff',fo:1,c:c,w:4})+poly([[x,y],[x+w/2,y+h*.3],[x+w,y]],{c:c,w:3,op:.45})+T(x+14,y+h*.76,txt,{s:20,mono:1})}
 function curve(d,c,w,dash){return `<path d="${d}" fill="none" stroke="${c}" stroke-width="${w||5}" stroke-linecap="round" ${dash?`stroke-dasharray="${dash}"`:''}/>`}
-function jump(x,y,w,txt,go,c){const fs=Math.min(21,(w-20)/(txt.length*.47));return `<g class="jump" data-go="${go}">`+rect(x,y,w,50,{fill:'#fff',fo:1,c:c||C.orange,w:4})+T(x+w/2,y+25+fs*.36,txt,{s:fs,a:'middle',c:c||'#c26d00',b:1})+`</g>`}
+function jump(x,y,w,txt,go,c){const fs=Math.min(21,(w-20)/(txt.length*.47));return `<g class="jump" data-go="${go}" data-name="${txt.replace(/ ·.*$/,'').replace(/^(Next: |← )/,'')}">`+rect(x,y,w,50,{fill:'#fff',fo:1,c:c||C.orange,w:4})+T(x+w/2,y+25+fs*.36,txt,{s:fs,a:'middle',c:c||'#c26d00',b:1})+`</g>`}
 function wrap(s,n){return s.split('\n').map(p=>{const w=p.split(' ');let L=[],c='';for(const x of w){if((c+' '+x).trim().length>n&&c){L.push(c);c=x}else c=(c+' '+x).trim()}L.push(c);return L.join('\n')}).join('\n')}
 function P(x,y,s,n,o){return T(x,y,wrap(s,n||28),Object.assign({s:23},o||{}))}
 const PAY="' OR '1'='1' LIMIT 1 -- ";
 
 /* ================= deep-level drawings (1000 x 625) ================= */
 ICON.badge=n=>'<g class="badge-zoom">'+ell(500,312,250,250,{fill:'#fff',fo:1,c:C.blue,w:44})+line(680,490,860,600,{c:C.blue,w:70})+T(500,412,String(n),{s:300,a:'middle',c:C.blue,b:1})+'</g>';
-ICON.rewrite=()=>{const x0=40,cw=34*.602;let s=T(40,70,'What the database receives:',{s:44,b:1})+T(x0,150,"SELECT … WHERE username = '",{s:34,mono:1});
- s+=rect(x0-6,180,cw*PAY.length+12,44,{fill:C.yel,fo:.75,c:'none'})+T(x0,212,PAY,{s:34,mono:1,c:C.red,b:1})+T(x0,280,"' AND password = '…'",{s:34,mono:1,c:C.grey,deco:'line-through'});
+ICON.rewrite=()=>{const x0=40,cw=34*.602;let s=T(40,70,'The search the database receives, line by line:',{s:40,b:1})+T(x0,150,"SELECT … WHERE username = '",{s:34,mono:1})+T(960,150,'written by the website',{s:27,a:'end',c:'#5c5647',b:1});
+ s+=rect(x0-6,180,cw*PAY.length+12,44,{fill:C.yel,fo:.75,c:'none'})+T(x0,212,PAY,{s:34,mono:1,c:C.red,b:1})+T(960,212,'typed by the attacker',{s:27,a:'end',c:C.red,b:1})+T(x0,280,"' AND password = '…'",{s:34,mono:1,c:C.grey,deco:'line-through'})+T(960,280,'ignored, never checked',{s:27,a:'end',c:C.grey,b:1});
  const g=[[0,1,"'",'It ends the name early.',C.red],[2,12,"OR '1'='1'",'This is always true, so every user matches.',C.blue],[13,20,'LIMIT 1','It keeps one user, which counts as a login.',C.purple],[21,23,'--','It makes MySQL ignore the rest, including the password check.',C.green]];
  g.forEach((q,i)=>{s+=line(x0+cw*q[0],230,x0+cw*q[1],230,{c:q[4],w:7});const bx=i%2?515:30,by=i<2?330:480;s+=rect(bx,by,450,130,{c:q[4],w:5,fill:'#fff',fo:.9})+T(bx+18,by+40,q[2],{s:30,mono:1,c:q[4],b:1})+T(bx+18,by+80,wrap(q[3],32),{s:27,c:q[4],b:1,lh:1.1})});return s};
 ICON.space=()=>T(500,250,'--',{s:200,a:'middle',mono:1,b:1})+rect(640,120,130,170,{fill:C.yel,fo:.8,c:C.orange,w:7,dash:'14 12'})+T(705,360,'a space',{s:52,a:'middle',c:C.orange,b:1})+arrow(705,320,705,300,{c:C.orange,w:8})+
- T(260,500,"--'",{s:64,a:'middle',mono:1,b:1})+cross(400,480,56)+T(260,580,'crashed',{s:40,a:'middle',c:C.red,b:1})+T(680,500,"-- '",{s:64,a:'middle',mono:1,b:1})+tick(830,480,60)+T(680,580,'worked',{s:40,a:'middle',c:C.green,b:1});
+ T(260,500,"--'",{s:64,a:'middle',mono:1,b:1})+cross(400,480,56)+T(260,580,'failed',{s:40,a:'middle',c:C.red,b:1})+T(680,500,"-- '",{s:64,a:'middle',mono:1,b:1})+tick(830,480,60)+T(680,580,'worked',{s:40,a:'middle',c:C.green,b:1});
 ICON.test=()=>rect(60,40,880,540,{fill:'#212529',fo:.95,w:8})+T(110,130,'$ test the database port (3306)',{s:40,mono:1,c:'#dee2e6'})+T(110,205,'timed out = blocked',{s:46,mono:1,c:'#ff8787',b:1})+
  T(110,345,'$ test the website port (80)',{s:40,mono:1,c:'#dee2e6'})+T(110,420,'open = website works',{s:46,mono:1,c:'#8ce99a',b:1})+cross(860,190,50,'#ff8787')+tick(860,400,56,'#8ce99a');
 ICON.help=()=>rect(40,60,280,110,{w:7})+T(180,132,'password',{s:46,a:'middle'})+arrow(340,115,450,115,{w:8})+`<path d="M480 115q25 -45 50 0t50 0t50 0t50 0" fill="none" stroke="${C.purple}" stroke-width="10"/>`+
@@ -187,14 +190,14 @@ ICON.call=()=>{let s=T(40,62,'The web server connects out first',{s:46,b:1});
  s+=cloudF(760,230,330,40);s+=curve('M320 330 Q470 250 600 240',C.green,10,'6 18')+arrow(580,241,602,240,{c:C.green,w:9,h:26});
  s+=T(300,180,'1. The server\nconnects out',{s:28,c:C.green,b:1});s+=laptop2(700,430,130)+arrow(765,415,765,315,{w:7,h:24})+T(795,390,'2. A teacher\nopens the link',{s:30,b:1});
  s+=curve('M600 275 Q470 290 335 360',C.orange,8)+arrow(352,352,334,362,{c:C.orange,w:8,h:24})+T(40,560,'3. Cloudflare passes the visit back over that connection.',{s:28,c:'#c26d00',b:1});return s};
-ICON.service=()=>T(40,62,'Started by hand',{s:44,b:1})+consoleF(40,95,330,130,[['$ cloudflared …']],34)+arrow(400,160,480,160,{w:7})+T(500,150,'Window closed or restart:',{s:36})+T(500,200,'the tunnel is gone.',{s:36,c:C.red,b:1})+cross(900,170,46)+
+ICON.service=()=>T(40,62,'Started by hand',{s:44,b:1})+consoleF(40,95,330,130,[['$ start the tunnel']],34)+arrow(400,160,480,160,{w:7})+T(500,150,'Window closed or restart:',{s:36})+T(500,200,'the tunnel is gone.',{s:36,c:C.red,b:1})+cross(900,170,46)+
  T(40,330,'As a service (systemd)',{s:44,b:1})+ell(150,460,85,85,{c:C.blue,w:9})+arrow(150,375,195,380,{c:C.blue,w:9,h:24})+T(150,478,'start-up',{s:38,a:'middle',c:C.blue,b:1})+arrow(260,460,340,460,{w:7})+T(370,450,'Linux starts the tunnel',{s:36})+T(370,500,'again by itself.',{s:36,c:C.green,b:1})+tick(900,470,56);
 ICON.race=()=>{let s=T(40,60,'After a restart',{s:44,b:1});const tl=(y,ux,ok)=>{let o=arrow(60,y,940,y,{w:6,c:C.grey})+ell(110,y,14,14,{fill:C.ink,fo:1,c:C.ink})+T(110,y+60,'restart',{s:32,a:'middle'})+ell(600,y,14,14,{fill:C.green,fo:1,c:C.green})+T(600,y+60,'new address',{s:32,a:'middle',c:C.green,b:1})+
   rect(ux-70,y-80,140,56,{fill:ok?C.mint:C.pink,fo:1,c:ok?C.green:C.red,w:5})+T(ux,y-42,'script',{s:32,a:'middle',b:1})+line(ux,y-24,ux,y,{w:5});return o};
  s+=tl(210,350,0)+T(330,325,'Too early: it saved the old address that no longer worked.',{s:34,c:C.red,b:1})+tl(480,760,1)+T(330,595,'Now it waits up to about 60 seconds.',{s:34,c:C.green,b:1});return s};
 ICON.refused=()=>T(40,70,'My first SSH try',{s:44,b:1})+rect(40,170,230,150,{fill:'#fff',fo:1,w:6})+T(155,235,'school server',{s:30,a:'middle',b:1})+T(155,280,'(EduCloud)',{s:26,a:'middle',c:C.grey})+
  bricks(430,140,3,7,40,30)+T(490,390,'kept separate inside GNS3',{s:28,a:'middle',c:C.grey,b:1})+rect(700,170,250,150,{fill:'#fff',fo:1,w:6})+T(825,235,'a lab machine',{s:30,a:'middle',b:1})+T(825,280,'(no route to it)',{s:24,a:'middle',c:C.grey})+
- arrow(280,245,420,245,{c:C.red,w:7,h:24})+cross(360,190,30)+T(40,480,'“Connection refused”',{s:40,c:C.red,b:1,mono:0})+T(40,560,'Fix: two Cloud nodes put the server on both lab networks.',{s:30,c:C.blue,b:1});
+ arrow(280,245,420,245,{c:C.red,w:7,h:24})+cross(360,190,30)+T(40,480,'“No connection”',{s:40,c:C.red,b:1,mono:0})+T(40,560,'Fix: two Cloud nodes put the server on both lab networks.',{s:30,c:C.blue,b:1});
 ICON.invisible=()=>T(40,70,'The same username, two ways',{s:44,b:1})+T(40,170,'Pasted into the login box:',{s:38})+rect(40,190,420,80,{w:6,fill:'#fff',fo:1})+rect(55,200,34,60,{fill:C.yel,fo:.9,c:C.orange,w:4,dash:'8 6'})+T(100,245,'name',{s:40,mono:1})+T(500,245,'matches no user',{s:40,c:C.red,b:1})+cross(860,230,46)+
  T(75,320,'an invisible space',{s:30,c:C.orange,b:1})+T(40,430,'Typed by hand:',{s:38})+rect(40,450,420,80,{w:6,fill:'#fff',fo:1})+T(60,505,'name',{s:40,mono:1})+T(500,505,'logs in',{s:40,c:C.green,b:1})+tick(860,490,52);
 ICON.order=()=>{let s=T(40,62,'The order I set things up in',{s:44,b:1});const st=[['1','Finish the address list'],['2','Set the firewall'],['3','Set the machines']];
@@ -206,7 +209,8 @@ function zoneBox(k){const m={problem:[C.red,C.pink,'1 · The problem'],fix:[C.bl
  return rect(0,0,400,900,{fill:m[1],fo:.32,c:m[0],w:5})+T(22,50,m[2],{s:32,c:m[0],b:1})+(k=='problem'?cross(362,38,34):k=='result'?tick(362,38,36):'')}
 function hand(txt,go){const n=CHN[go],nl=wrap(txt,30).split('\n').length;return P(22,780-(nl-1)*27,txt,30,{s:21,c:'#a35c00',b:1})+jump(22,815,356,n?'Next: Challenge '+n[0]+' · '+n[1]+' →':'Next: The whole lab →',go)}
 const CHN={c1:[1,'Address plan'],c2:[2,'SQL injection'],c3:[3,'Copy-paste'],c4:[4,'Firewall rule'],c5:[5,'The tunnel'],c6:[6,'Password hashing'],c7:[7,'Both login versions'],c8:[8,'Permanent link']};
-const KALI=(x,y,s)=>person(x,y,s,C.ink,1)+T(x,y+s*.75,'Kali',{s:19,a:'middle',c:C.grey});
+const KALI=(x,y,s)=>person(x,y,s,C.ink,1)+T(x,y+s*.75,'attacker',{s:19,a:'middle',c:C.grey});
+const PTR=y=>T(22,y,O=='P'?'For more details, see the note below.':'For more details, see the note on the side.',{s:18,c:'#6b6450'});
 const Z={
  p1:()=>zoneBox('problem')+KALI(65,175,86)+T(128,128,'What the attacker typed\ninto the username box:',{s:21,b:1})+pill(22,300,PAY)+
    arrow(200,325,268,372,{c:C.red,w:5,h:14})+door(282,360,95,150,1)+person(350,480,46,C.ink,1)+P(22,400,'The login page let the attacker in without any password.',15,{c:C.red,b:1}),
@@ -224,7 +228,7 @@ const Z={
    T(40,327,'Block traffic',{s:22,b:1})+T(40,360,'from: Kali (the attacker)',{s:21})+T(40,393,'to: the database, port 3306',{s:21})+
    P(22,470,'Everything else still passes, so the website keeps working.',30),
  r2:()=>zoneBox('result')+KALI(55,160,70)+arrow(98,140,160,140,{c:C.red,w:5,h:13})+bricks(170,90,1,4,30,26)+cross(228,140,28)+dbi(315,105,70)+
-   P(22,250,'Kali can no longer reach the database directly.',28,{c:C.red,b:1})+websrv(30,320,90)+arrow(130,350,255,350,{c:C.green,w:5,h:13})+dbi(315,320,70)+T(75,405,'Ubuntu-3',{s:17,a:'middle',c:C.grey})+
+   P(22,250,'Kali can no longer reach the database directly.',28,{c:C.red,b:1})+websrv(30,320,90)+arrow(130,350,255,350,{c:C.green,w:5,h:13})+dbi(315,320,70)+T(75,405,'web server',{s:17,a:'middle',c:C.grey})+
    P(22,455,'The website still uses the database normally.',28,{c:C.green,b:1})+hand('The lab was protected inside, but teachers outside the closed lab could not reach it yet.','c5'),
  p3:()=>{let s=zoneBox('problem')+rect(22,90,300,190,{fill:'#fff',fo:1,w:4})+rect(22,90,300,40,{fill:C.lav,fo:.7,w:3})+T(40,118,'username',{s:19,b:1})+T(180,118,'password',{s:19,b:1})+line(165,90,165,280,{w:3});
    for(let i=0;i<3;i++){s+=line(40,162+i*46,140,162+i*46,{c:C.grey,w:4})+T(180,168+i*46,'as typed',{s:21,c:C.red,b:1})}
@@ -269,7 +273,7 @@ const Z={
    hand('Teachers needed one link to this page, but the tunnel got a new address at every restart.','c8'),
  p7:()=>zoneBox('problem')+consoleF(22,90,356,170,[['$ sudo nano /etc/...'],['Ctrl+V: nothing happens',C.red?'#ff8787':'',1]],20)+cross(340,230,26,'#ff8787')+
    P(22,320,'The screens of the lab machines (consoles) would not accept paste. Every long command had to be typed by hand, letter by letter.',30,{c:C.red,b:1}),
- f7:()=>zoneBox('fix')+laptop2(30,95,70)+T(65,185,'my terminal',{s:17,a:'middle',c:C.grey})+arrow(110,115,165,115,{c:C.blue,w:4,h:12})+T(137,100,'remote typing (SSH)',{s:13,a:'middle',c:C.blue,b:1})+
+ f7:()=>zoneBox('fix')+laptop2(30,95,70)+T(65,185,'my terminal',{s:17,a:'middle',c:C.grey})+arrow(110,115,165,115,{c:C.blue,w:4,h:12})+T(137,104,'SSH',{s:16,a:'middle',c:C.blue,b:1})+
    rect(170,92,110,50,{fill:'#fff',fo:1,w:4})+T(225,116,'school server',{s:15,a:'middle',b:1})+T(225,134,'EduCloud',{s:13,a:'middle',c:C.grey})+line(240,142,300,215,{c:C.blue,w:4})+line(210,142,95,215,{c:C.blue,w:4})+
    kaliPC(65,220,60)+T(95,300,'LAN1',{s:16,a:'middle',c:C.grey})+websrv(250,222,50)+dbi(335,228,40)+T(300,300,'LAN2',{s:16,a:'middle',c:C.grey})+
    P(22,360,'I linked the school server (EduCloud) to both lab networks with two connector pieces (“Cloud” nodes).',30)+
@@ -278,20 +282,33 @@ const Z={
    P(22,260,'Paste works, so long commands and whole files go in quickly.',30,{c:C.green,b:1})+
    hand('The website and database now ran in the lab, but nothing stopped the attacker from reaching the database directly.','c4'),
  p8:()=>zoneBox('problem')+rect(22,90,165,215,{fill:'#fff',fo:1,w:4})+T(104,116,'My written list',{s:17,a:'middle',b:1})+T(104,136,'of addresses',{s:17,a:'middle',b:1})+
-   T(30,172,'servers: LAN1',{s:13,mono:1})+T(30,200,'Ubuntu-3: LAN2 no.',{s:13,mono:1})+T(30,228,'Kali: outside',{s:13,mono:1})+T(30,256,'both nets: LAN1',{s:13,mono:1})+cross(170,290,14)+
-   rect(213,90,165,215,{fill:'#fff',fo:1,w:4})+T(295,116,'The real cables',{s:17,a:'middle',b:1})+T(295,136,'(in GNS3)',{s:15,a:'middle',c:C.grey})+
+   T(32,170,'servers on LAN1',{s:15})+T(32,198,'web server: a',{s:15})+T(32,216,'LAN2 number',{s:15})+T(32,244,'attacker: outside',{s:15})+T(32,272,'both networks: LAN1',{s:15})+cross(170,290,14)+
+   rect(213,90,165,215,{fill:'#fff',fo:1,w:4})+T(295,116,'The real GNS3',{s:17,a:'middle',b:1})+T(295,136,'virtual cables',{s:15,a:'middle',c:C.grey})+
    rect(265,150,60,28,{fill:'#ffa8a8',fo:.6,w:3})+T(295,170,'firewall',{s:13,a:'middle'})+line(280,178,245,210,{w:3})+line(310,178,345,210,{w:3})+
-   T(245,228,'switch 1',{s:13,a:'middle'})+T(345,228,'switch 2',{s:13,a:'middle'})+line(245,234,245,252,{w:3})+line(345,234,345,252,{w:3})+T(245,272,'Kali',{s:14,a:'middle',b:1})+T(345,272,'both',{s:14,a:'middle',b:1})+T(345,290,'servers',{s:14,a:'middle',b:1})+
+   T(245,228,'switch 1',{s:13,a:'middle'})+T(345,228,'switch 2',{s:13,a:'middle'})+line(245,234,245,252,{w:3})+line(345,234,345,252,{w:3})+T(245,272,'attacker',{s:14,a:'middle',b:1})+T(345,272,'both',{s:14,a:'middle',b:1})+T(345,290,'servers',{s:14,a:'middle',b:1})+
    T(200,205,'≠',{s:40,a:'middle',c:C.red,b:1})+
    P(22,350,'My written list of addresses did not match how the virtual machines were really cabled. Machines set up from the list were on the wrong network, so they could not reach the firewall and every test failed.',31,{c:C.red,b:1})+
-   P(22,560,'See the note on the side for what each one said.',31,{s:19,c:C.grey}),
- f8:()=>{let s=zoneBox('fix')+rect(22,85,356,300,{fill:'#fff',fo:1,c:C.blue,w:4});const r=[['LAN1 · the attacker\'s network',1],['firewall (gateway)','192.168.1.1'],['Kali','192.168.1.100'],['LAN2 · the servers\' network',1],['firewall (gateway)','192.168.2.1'],['Ubuntu-3 (website)','192.168.2.100'],['Ubuntu-1 (database)','192.168.2.20']];
-   r.forEach((q,i)=>{const y=120+i*38;s+=q[1]===1?T(36,y,q[0],{s:19,b:1,c:C.blue}):T(46,y,q[0],{s:18})+T(366,y,q[1],{s:17,mono:1,a:'end'})});
+   PTR(600),
+ f8:()=>{let s=zoneBox('fix')+rect(22,85,356,300,{fill:'#fff',fo:1,c:C.blue,w:4});const r=[['LAN1 · the attacker\'s network',1],['firewall','the gateway'],['attacker (Kali)','fixed address'],['LAN2 · the servers\' network',1],['firewall','the gateway'],['web server','fixed address'],['database','fixed address']];
+   r.forEach((q,i)=>{const y=120+i*38;s+=q[1]===1?T(36,y,q[0],{s:19,b:1,c:C.blue}):T(46,y,q[0],{s:18})+T(366,y,q[1],{s:17,a:'end',c:'#495057'})});
    return s+P(22,430,'I checked which firewall port each switch is plugged into, then wrote one new list that matches the real cables. Every machine has a fixed address.',30,{c:C.blue,b:1})},
  r8:()=>zoneBox('result')+P(22,100,'Every machine reaches its gateway, and Kali reaches both servers through the firewall.',30,{c:C.green,b:1})+
    P(22,235,'Because every address is fixed, the firewall rule in Challenge 4 can name exactly Kali and the database.',30)+
    hand('The network worked, so next I built the login page and attacked it on my laptop.','c2')
 };
+/* the two slips that belong inside a zone, drawn at the same level */
+const SSHBOX=()=>{let s=rect(22,585,356,250,{fill:'#fff9db',fo:.9,c:C.orange,w:4,dash:'10 7'})+T(38,620,'Why SSH failed at first',{s:22,b:1,c:'#c26d00'});
+ s+=rect(36,645,105,52,{fill:'#fff',fo:1,w:3})+T(88,668,'school',{s:15,a:'middle',b:1})+T(88,686,'server',{s:15,a:'middle',b:1})+bricks(176,640,2,2,22,30)+rect(262,645,105,52,{fill:'#fff',fo:1,w:3})+T(314,668,'lab',{s:15,a:'middle',b:1})+T(314,686,'machine',{s:15,a:'middle',b:1});
+ s+=arrow(146,671,172,671,{c:C.red,w:4,h:10})+cross(205,712,22);
+ return s+P(38,750,'The school server was on neither lab network yet, so SSH had no way in. The two Cloud nodes fixed that.',36,{s:18,c:'#5c5647'})};
+const SPACEBOX=()=>'<g transform="translate(0,18)">'+SPACEBOX0()+'</g>';
+const SPACEBOX0=()=>{let s=rect(22,405,356,226,{fill:'#fff9db',fo:.9,c:C.orange,w:4,dash:'10 7'})+T(38,440,'A slip in my test: an invisible space',{s:20,b:1,c:'#c26d00'});
+ s+=T(38,478,'pasted:',{s:17,c:'#5c5647'})+rect(112,458,140,34,{fill:'#fff',fo:1,w:3})+rect(118,463,14,24,{fill:C.yel,fo:.95,c:C.orange,w:2})+T(138,482,'name',{s:18,mono:1})+cross(282,475,20)+T(300,481,'no user',{s:16,c:C.red,b:1});
+ s+=T(38,530,'typed:',{s:17,c:'#5c5647'})+rect(112,510,140,34,{fill:'#fff',fo:1,w:3})+T(122,534,'name',{s:18,mono:1})+tick(282,525,22)+T(300,533,'logs in',{s:16,c:C.green,b:1});
+ return s+P(38,566,'Copying a username into the login box added an invisible space in front of it. My slip, not a login flaw.',40,{s:16,c:'#5c5647'})};
+{const ex={f7:SSHBOX,r6:SPACEBOX},py={p1:545,f2:560,r2:545,f3:525,r3:420,p4:665,f5:470,p7:480,f7:870,p8:600,f8:600};
+ for(const k in Z){const f=Z[k];Z[k]=()=>{let s=f();if(ex[k])s+=ex[k]();if(py[k]&&k!='p8')s+=PTR(py[k]);return s}}}
+
 /* ================= challenge frames ================= */
 const CF={L:[1360,1110],P:[460,3300]};
 const ZB=i=>({L:[[30,140],[480,140],[930,140]][i].concat(400),P:[[30,260],[30,1250],[30,2240]][i].concat(400)});
@@ -309,7 +326,7 @@ function chal(num,id,short,long,def,pos,lblL,note,zones){const n={id,num,short,l
 const DEEP=(id,title,cap,kind,icon,L,note)=>({id,title,cap,kind,icon,deep:1,box:{L:L,P:L},note,decor:()=>ICON[icon]()});
 
 const TREE={id:'lab',title:'My lab',kind:'place',frame:{L:[1500,990],P:[800,2200]},fitW:{P:1},
- note:{text:"My network inside {EduCloud|educloud}, built in {GNS3|gns3}: four virtual computers. Outside the lab box is the path a teacher uses to reach the website from outside. Each numbered magnifier holds one of the eight challenges I met while building it, in the order I met them. Scroll or click on one to zoom into it."},
+ note:{text:"My network inside {EduCloud|educloud}, built in {GNS3|gns3}: four virtual computers. Outside the lab box is the path a teacher uses to reach the website from outside. Each numbered object holds one of the eight challenges I met while building it, numbered in the order I met them. Scroll or click on any of them to zoom inside, starting with number 1, the tag tied around the cables."},
  decor:o=>topDecor(o),kids:[
  chal(2,'c2','SQL injection','Challenge 2 · Breaking into the login page','SQL injection: typing text into a form that the website then runs as database instructions.',[[548,212],[440,868]],{P:1},
   {text:"This happened on the web server (Ubuntu-3). Its login page asks the {database} to find the user with the typed name and password. That question is written in {SQL|sql}. The weak version pasted the visitor's text straight into it. Click a zone to read more."},
@@ -317,61 +334,50 @@ const TREE={id:'lab',title:'My lab',kind:'place',frame:{L:[1500,990],P:[800,2200
      code:[['What the attacker typed (it ends with a space)',PAY]],sees:"The first clue: typing a single ' gave an SQL error message. That showed my typed text was being pasted straight into the search."},
     kids:[DEEP('rewrite','Piece by piece','Each piece changes\nthe search.','problem','rewrite',[17,600,166],{text:"The website pastes the typed text between two quotes inside its search. The attacker's text closes that quote early and adds its own instructions. The database cannot tell which part came from the website and which part came from the visitor.",
        code:[['The weak login (real code, shortened)',"$sql = \"SELECT username FROM users WHERE username = '\"\n     . $_POST[\"username\"] . \"' AND password = '\" . $_POST[\"password\"] . \"'\";"]]}),
-     DEEP('space','One missing space','It failed until I\nadded one space.','problem','space',[217,600,166],{text:"My first attack crashed the page instead of logging in. I printed the exact search the page built and saw it ended in `--'`. MySQL only treats `--` as “ignore the rest” when a space follows it. With the space, the attack worked.",
-       code:[['What MySQL received (crashed)',"... OR '1'='1' LIMIT 1 --'"],['With the space (worked)',"... OR '1'='1' LIMIT 1 -- '"]]})]},
+     DEEP('space','One missing space','It failed until I\nadded one space.','problem','space',[217,600,166],{text:"My first attack only gave an error instead of logging in. I printed the exact search the page built and saw it ended in `--'`. MySQL only treats `--` as “ignore the rest” when a space follows it. With the space, the attack worked.",
+       code:[['What MySQL received (failed)',"... OR '1'='1' LIMIT 1 --'"],['With the space (worked)',"... OR '1'='1' LIMIT 1 -- '"]]})]},
    {id:'f1',title:'The fix: a prepared statement',note:{text:"The secure version first sends the database the search with an empty slot (a ?) where the username goes. The visitor's text is sent separately. The database only ever uses it as a name to look up, never as part of the search instructions. This is called a {prepared statement}.",
      code:[['The secure login (real code, shortened)','$stmt = $conn->prepare("SELECT password FROM users WHERE username = ?");\n$stmt->bind_param("s", $_POST["username"]);\n$stmt->execute();']]}},
    {id:'r1',title:'The result',note:{text:"The same attack text is now just looked up as a strange username. No user has that name, so the login fails. A real user with the correct password still logs in normally. Challenge 7 shows how teachers can try both versions themselves."}}]),
  chal(4,'c4','Firewall rule','Challenge 4 · Keeping the attacker away from the database','A firewall is a program between networks that decides, rule by rule, which traffic may pass.',[[355,418],[150,1078]],{L:1},
   {text:"This happened in the {pfSense} {firewall}, which sits between the attacker's network and the servers' network. Same attacker (Kali), same database as in Challenge 2."},
   [{id:'p2',title:'The problem',note:{text:"The database program ({MySQL|mysql}) waits for connections at {port} 3306. I had opened it to the network so the web server could use it. Without a rule, the attacker's machine could connect to that same port directly and skip the website entirely."}},
-   {id:'f2',title:'The fix: one precise firewall rule',note:{text:"In pfSense's settings page I added one rule: block traffic from Kali to the database on port 3306. It sits above the general “allow” rule, so it is checked first. I first tried a quick block typed on the firewall's command line, but it could only shut Kali out completely, not just keep it away from the database's {port}. That would also have cut Kali off from the website it is supposed to attack."},
-    kids:[DEEP('test','How I checked it','The database port is blocked;\nthe website port is open.','fix','test',[117,600,166],{text:"From Kali I tested both ports. The test to the database's port now times out, which means it is blocked. The test to the website's port (80) is open, so the website still works. The addresses come from the address plan in Challenge 1.",
-       code:[['From Kali (2.20 = database, 2.100 = web server)',"nc -zv -w 5 192.168.2.20 3306    # timed out = blocked\nnc -zv -w 5 192.168.2.100 80     # open = website fine"]]})]},
-   {id:'r2',title:'The result',note:{text:"Kali can no longer open a connection to the database. The website keeps working, and the web server can still use the database. An attacker can now only reach the database through the website, which is exactly the path Challenge 2 secured.",
+   {id:'f2',title:'The fix: one precise firewall rule',note:{text:"In pfSense's settings page I added one rule: block traffic from Kali to the database on port 3306. It sits above the general “allow” rule, so it is checked first. I first tried a quick block typed on the firewall's command line, but it could only shut Kali out completely, not just keep it away from the database's {port}. That would also have cut Kali off from the website it is supposed to attack."}},
+   {id:'r2',title:'The result',note:{text:"I checked it from Kali: a connection test to the database's port now gets no answer, while the website's port is still open. Kali can no longer open a connection to the database. The website keeps working, and the web server can still use the database. An attacker can now only reach the database through the website, which is exactly the path Challenge 2 secured.",
      sees:"As an extra limit, the website logs in to the database with an account that can only read the users table. Even a successful attack through the website could not change or delete data."}}]),
  chal(6,'c6','Password\nhashing','Challenge 6 · Storing passwords safely','A hash is a scrambled, one-way version of a password: you can check a password against it, but not turn it back.',[[712,598],[640,1250]],{},
   {text:"This happened in the database (Ubuntu-1), in the table of users. It is about what an attacker would find if they ever got a copy of that table."},
   [{id:'p3',title:'The problem',note:{text:"The users table kept each password in plain text, exactly as typed. Anyone who got a copy of the table, for example through an attack like the one in Challenge 2, could read every password straight away."}},
-   {id:'f3',title:'The fix: store a hash',note:{text:"The secure login stores only a {hash} of each password, made with {bcrypt}. When someone logs in, PHP scrambles the typed password the same way and compares the two. One practical problem: a hash is 60 characters long, longer than my password column allowed, so I had to widen the column first.",
-     code:[['Checking a login (real code)','if (password_verify($_POST["password"], $row["password"])) {']]}},
-   {id:'r3',title:'The result',note:{text:"A copy of the table now only shows scrambled hashes. But hashing is not what stopped the SQL injection: that attack never needs to know a password. Zoom in to see how I found that out."},
-    kids:[DEEP('help','Did hashing help?','I wasn\'t sure which change\nstopped the attack.','info','help',[117,440,166],{text:"I added hashing and the prepared statement at the same time, so I wasn't sure which one had stopped the attack. Hashing only changes how passwords are stored. It never touches the search text, so on its own it cannot stop SQL injection.",
-       exCtx:"So I asked Grok. (“bindparam” is my short name for bind_param, the line that hands the typed text to the database separately.)",ex:[['Me','so is it hashing tha solved the sql injection or the bindparam?'],['Grok','Hashing did not solve the SQL injection. The prepared statement (with the ? and bind_param) did.']]})]}]),
+   {id:'f3',title:'The fix: store a hash',note:{text:"The secure login stores only a {hash} of each password, made with {bcrypt}. When someone logs in, PHP scrambles the typed password the same way and compares the two. One practical problem: a hash is 60 characters long, longer than my password column allowed, so I had to widen the column first."}},
+   {id:'r3',title:'The result',note:{text:"A copy of the table now only shows scrambled hashes. But hashing is not what stopped the SQL injection: that attack never needs to know a password. I added hashing and the prepared statement at the same time, so at first I wasn't sure which one had stopped the attack.",
+     exCtx:"So I asked Grok. (“bindparam” is my short name for bind_param, the line that hands the typed text to the database separately.)",ex:[['Me','so is it hashing tha solved the sql injection or the bindparam?'],['Grok','Hashing did not solve the SQL injection. The prepared statement (with the ? and bind_param) did.']]}}]),
  chal(5,'c5','The tunnel','Challenge 5 · Letting teachers in without opening the firewall','A tunnel is a line the server opens from inside to an outside service. Visitors come back in through it.',[[865,296],[620,720]],{},
   {text:"How can a teacher reach a website inside a closed lab? The web server itself opens a {tunnel} out to {Cloudflare|cloudflare}, and visitors reach the website over that connection. The firewall is not opened to incoming connections."},
   [{id:'p4',title:'The problem',note:{text:"The lab lives inside {EduCloud|educloud}, which only people with a {VPN} login can reach. Teachers should be able to try the attack from their own laptops. EduCloud gives the lab no public internet address and does not allow forwarding a port to it, so the usual way of publishing a website was not available."}},
-   {id:'f4',title:'The fix: a Cloudflare quick tunnel',note:{text:"A small program on the web server (cloudflared) opens an ordinary outgoing connection to Cloudflare, the same kind a browser makes, and keeps it open. Cloudflare gives it a public address. When a teacher opens that address, Cloudflare sends the request down the already-open connection, and the web server answers the same way. Cloudflare only relays; my files never leave the web server.",
-     code:[['Starting the tunnel on the web server','cloudflared tunnel --url http://127.0.0.1:80']]},
+   {id:'f4',title:'The fix: a Cloudflare quick tunnel',note:{text:"A small program on the web server (cloudflared) opens an ordinary outgoing connection to Cloudflare, the same kind a browser makes, and keeps it open. Cloudflare gives it a public address. When a teacher opens that address, Cloudflare sends the request down the already-open connection, and the web server answers the same way. Cloudflare only relays; my files never leave the web server."},
     kids:[DEEP('call','Why the firewall allows it','To the firewall it looks\nlike a normal reply.','fix','call',[117,640,166],{text:"Firewalls block connections that start outside. They allow connections that start inside, and the replies that come back on them. The tunnel starts inside, so the teachers' requests arrive as replies on a connection the server opened itself.",
        exCtx:"I asked how Cloudflare could send a teacher's request into the lab without the firewall stopping it:",ex:[['Me','how can it push back the request to the webserver without the firewall interveneing?'],['Grok','To the firewall it looks like normal reply traffic on a connection Ubuntu-3 itself started. Nothing new is trying to come in from the outside.']]})]},
    {id:'r4',title:'The result',note:{text:"A teacher can open the login page from anywhere, with no VPN. No firewall was opened to incoming connections.",sees:"I restarted the web server to test it: the tunnel came back by itself."},
-    kids:[DEEP('service','It keeps running','It starts by itself after\nevery restart.','fix','service',[117,490,166],{text:"At first I started the tunnel by hand, so it stopped as soon as I closed the window or the machine restarted. I turned it into a {systemd} service: Linux now starts it every time the machine starts and restarts it if it crashes.",
-       code:[['The key line of the service file','ExecStart=/usr/bin/cloudflared tunnel --url http://127.0.0.1:80\nRestart=on-failure']]})]}]),
+    kids:[DEEP('service','It keeps running','It starts by itself after\nevery restart.','fix','service',[117,490,166],{text:"At first I started the tunnel by hand, so it stopped as soon as I closed the window or the machine restarted. I turned it into a {systemd} service: Linux now starts it every time the machine starts and restarts it if it crashes."})]}]),
  chal(8,'c8','Permanent\nlink','Challenge 8 · One link that never changes','A redirect is a page whose only job is to send the browser on to another address.',[[965,432],[642,410]],{L:1},
   {text:"The tunnel's address changes on every restart, so a page on {GitHub Pages|github pages} {redirects|redirect} visitors to the newest one. A teacher only needs one link."},
   [{id:'p5',title:'The problem',note:{text:"The free quick tunnel gets a new random address every time it starts. A fixed address would need a domain name of my own: free ones now cost money or take days to be approved, so I chose the free path and solved the changing address myself."}},
-   {id:'f5',title:'The fix: a self-updating redirect',note:{text:"A tiny page on GitHub Pages forwards every visitor to the current tunnel address. After each restart of the web server, a {script} on the web server reads the new address and uploads an updated page. The key it uploads with only works for that one repository, so even if the web server were hacked it could not touch anything else.",
-     code:[['The whole forwarding page, shortened','<meta http-equiv="refresh" content="0; url=CURRENT-TUNNEL-ADDRESS/login_v4.php">']]},
-    kids:[DEEP('race','Too quick after a restart','The script ran before the\nnew address existed.','problem','race',[117,470,166],{text:"After a restart the link still led to an old address that no longer worked. The script had finished before the tunnel had its new address, so it found an old one from an earlier start. Now it waits up to about 60 seconds for the new address, and only looks at messages from the current start."})]},
+   {id:'f5',title:'The fix: a self-updating redirect',note:{text:"A tiny page on GitHub Pages forwards every visitor to the current tunnel address. After each restart of the web server, a {script} on the web server reads the new address and uploads an updated page. The key it uploads with only works for that one repository, so even if the web server were hacked it could not touch anything else."+" One snag: right after a restart the script was too quick and saved an old address that no longer worked. Now it waits up to about 60 seconds for the new address before uploading."}},
    {id:'r5',title:'The result',note:{text:"One link for teachers that keeps working: https://arpadorovecz.github.io/SQL-injection/",sees:"Right after a restart, a browser may still use the old address for up to 10 minutes, because it keeps a saved copy ({cache}). A private window gets the new one immediately."}}]),
  chal(7,'c7','Both login\nversions','Challenge 7 · Showing the attack and the fix side by side','Two buttons on one page: one login is still unsafe, the other one is fixed.',[[975,665],[642,205]],{L:1},
   {text:"This is what a teacher sees after opening the link: one page where they can try the attack on both versions."},
   [{id:'p6',title:'The problem',note:{text:"After the fix, the attack simply failed. A teacher trying it would see “Login failed.” and nothing else, with no way to tell that the login had ever been unsafe, or that the fix was the reason."}},
    {id:'f6',title:'The fix: one page, two buttons',note:{text:"The page asks which version you want. “Vulnerable login” uses the old search from Challenge 2 that puts the typed text straight into the database command. “Secure login” uses the prepared statement and the password hash from Challenge 6. Because the tunnel makes the page public, a teacher password in front keeps random visitors out."}},
-   {id:'r6',title:'The result',note:{text:"In one visit a teacher sees the attack work on the vulnerable login and fail on the secure one, while a real user can log in on both.",sees:"I tested it from Kali inside the lab, and again from outside through the permanent link. Zoom into the small drawing for a slip I made during that test."},
-    kids:[DEEP('invisible','An invisible space','A pasted space made\nreal logins fail.','problem','invisible',[117,450,166],{text:"This happened while I tested this two-version page from Kali. The attack worked, but real logins failed on both versions. On my laptop the same file worked, so the code was fine. The attack needs no correct username, but a real login does, so the username had to be the difference. Copying it from my test instructions into the login box on Kali put an invisible space in front of it. Typing it by hand fixed it. It was a slip in my test, not a flaw in either version."})]}]),
+   {id:'r6',title:'The result',note:{text:"In one visit a teacher sees the attack work on the vulnerable login and fail on the secure one, while a real user can log in on both.",sees:"I tested it from Kali inside the lab, and again from outside through the permanent link. During that test real logins suddenly failed on both versions, while the attack still worked. On my laptop the same file worked, so the code was fine. The attack needs no correct username, but a real login does, so the username had to be the difference. Copying it from my test instructions into the login box had put an invisible space in front of it. Typing it by hand fixed it: a slip in my test, not a flaw in either version."}}]),
  chal(3,'c3','Copy-paste','Challenge 3 · Getting text into the lab machines','A console is the built-in screen of a virtual machine, opened in a browser window.',[[100,682],[335,1612]],{},
   {text:"This affected every machine in the lab. It slowed down every other challenge until I solved it."},
-  [{id:'p7',title:'The problem',note:{text:"The lab machines' {consoles|console} did not accept paste. Every configuration file and every long command had to be typed by hand, and one typo could cost a long search.",exCtx:"What I wrote to Grok when it happened. “It” is the console window; Gemini is another AI assistant I had asked first.",ex:[['Me','yeah, next problem I cannot paste into it. Gemini coulnt solve this']]}},
-   {id:'f7',title:'The fix: type commands from my own computer',note:{text:"In GNS3 I added two “Cloud” nodes that connect the EduCloud server to both lab networks. From the EduCloud server I can now reach every machine with {SSH|ssh}, a remote terminal where copy and paste work normally. Files go from my laptop to the EduCloud server and from there into the lab. Zoom into the small drawing to see why SSH did not work at first."},
-    kids:[DEEP('refused','Why SSH failed at first','The school server could\nnot reach the lab yet.','problem','refused',[117,545,166],{text:"My first SSH try from the school server ended with “Connection refused”. The lab networks are kept separate inside GNS3, so the school server had no way to reach a lab machine. That is why the fix needed the two Cloud nodes: they put the school server on both lab networks, and only then did SSH, and with it paste, work."})]},
+  [{id:'p7',title:'The problem',note:{text:"The lab machines' {consoles|console} did not accept paste. Every configuration file and every long command had to be typed by hand, and one typo could cost a long search.",exCtx:"What I wrote to Grok when it happened. “It” is the console window; Gemini is another AI assistant I had asked first.",ex:[['Me','yeah, next problem I cannot paste into it. Gemini coulnt fix it either']]}},
+   {id:'f7',title:'The fix: type commands from my own computer',note:{text:"In GNS3 I added two “Cloud” nodes that connect the EduCloud server to both lab networks. From the EduCloud server I can now reach every machine with {SSH|ssh}, a remote terminal where copy and paste work normally. Files go from my laptop to the EduCloud server and from there into the lab. The box at the bottom shows why SSH did not work at first: my first try from the school server was refused, because the lab networks are kept separate inside GNS3 and the school server was on neither of them. The two Cloud nodes put it on both networks, and only then did SSH, and with it paste, work."}},
    {id:'r7',title:'The result',note:{text:"Long commands and whole files now go in within seconds, on every machine in the lab."}}]),
  chal(1,'c1','Address plan','Challenge 1 · A fixed address plan','An IP address is a computer\'s number on a network. Every machine here has a fixed one.',[[75,226],[110,792]],{},
   {text:"This concerns the whole lab: the two networks, LAN1 for the attacker and LAN2 for the servers, and the address of every machine. It was the first thing I had to get right, and everything else depends on it."},
   [{id:'p8',title:'The problem: my list and my cables disagreed',note:{text:"I had two descriptions of the same lab. One was my written list of addresses: a text file saying which network each machine is on and which number it gets. The other was the real wiring: the virtual cables I had connected in GNS3, with Kali on switch 1 and both servers on switch 2. They disagreed. The list called both of the firewall's lab networks “LAN1”, said the servers belong on LAN1 while giving one of them a LAN2 number, and put Kali on the firewall's outside link. A machine can only reach the {gateway} on its own cable, so every setting I typed from the list failed. I had also set up the machines before the firewall, so their gateway did not exist yet."}},
-   {id:'f8',title:'The fix: trust the real cables',note:{text:"I treated the real cables as the truth. To see which firewall port belonged to which switch, I disconnected switch 1 for a moment and watched which port lost its connection. Then I wrote one new list that matches the cables. The attacker sits alone on LAN1; both servers sit on LAN2; the firewall is the gateway of each network. Every address is fixed, so it never changes."},
-    kids:[DEEP('order','Firewall first','A machine can\'t reach a\ngateway that isn\'t there yet.','fix','order',[117,580,166],{text:"The order matters: first finish the address list, then set up the firewall's side of each network, and only then the machines. A machine cannot reach a gateway that does not exist yet."})]},
+   {id:'f8',title:'The fix: trust the real cables',note:{text:"I treated the real cables as the truth. To see which firewall port belonged to which switch, I disconnected switch 1 for a moment and watched which port lost its connection. Then I wrote one new list that matches the cables. The attacker sits alone on LAN1; both servers sit on LAN2; the firewall is the gateway of each network. Every address is fixed, so it never changes. I also changed the order: first the address list, then the firewall's side of each network, and only then the machines, because a machine cannot reach a gateway that does not exist yet."}},
    {id:'r8',title:'The result',note:{text:"Every machine answers a {ping} from its gateway, and Kali reaches both servers through the firewall. The fixed addresses are what make the firewall rule in Challenge 4 possible: it names exactly Kali and the database."}}])
 ]};
 TREE.kids.sort((a,b)=>a.num-b.num);CH.sort((a,b)=>a.num-b.num);
@@ -379,63 +385,122 @@ function navHTML(n){return ''}
 function deepLabel(n,b){const fs=22,w=n.title.length*fs*.47,cx=b.x+b.w/2,y=b.y+b.h+30,gx=cx-w/2-16;
  return `<g class="go lbl" data-go="${n.id}">`+ell(gx,y-8,8,8,{c:C.blue,w:3.5})+line(gx+6,y-2,gx+12,y+4,{c:C.blue,w:4})+T(cx,y,n.title,{s:fs,a:'middle',b:1,c:KC[n.kind]})+T(cx,y+25,n.cap,{s:19,a:'middle',c:'#5c5647'})+`</g>`}
 
-/* ================= spots: each challenge lives inside a magnifier in the picture ================= */
-const OFF={L:60,P:0},SR={L:46,P:52};
-// centre, label position [dx,dy,anchor] relative to centre, in net coordinates
-const SPOT={L:{c1:[440,872,'r'],c2:[500,250,'b'],c3:[120,280,'t'],c4:[410,355,'l'],c5:[905,330,'r'],c6:[778,628,'t',2],c7:[905,705,'b',2],c8:[945,560,'t']},
- P:{c1:[420,2030,'r'],c2:[330,860,'b'],c3:[450,1590,'r'],c4:[390,1150,'b'],c5:[700,780,'t'],c6:[690,1300,'t',2],c7:[330,240,'l',2],c8:[390,450,'l',2]}};
-// waypoints between spot k and k+1 (net coordinates)
-const ROUTE={L:{1:[[20,872],[20,205],[400,205]],2:[],3:[],4:[[530,440],[790,440],[790,330]],5:[[868,420],[868,600]],6:[],7:[]},P:{1:[[35,2030],[35,860]],2:[[110,920],[110,1720],[450,1720]],3:[],4:[[460,1170],[720,1170]],5:[[770,780],[770,1240]],6:[[790,1340],[790,690],[220,690],[220,240]],7:[]}};
-function spotCard(c,o){const s=SPOT[o][c.id],R=SR[o],w=R*1.5;return [s[0]+OFF[o]-w/2,s[1]-w*CF.L[1]/CF.L[0]/2,w]}
-TREE.kids.forEach(c=>{c.box={};for(const o of ['L','P'])if(SPOT[o][c.id])c.box[o]=spotCard(c,o)});
-function rp(pts,r){let d=`M${pts[0][0]} ${pts[0][1]}`;for(let i=1;i<pts.length-1;i++){const [a,b,c]=[pts[i-1],pts[i],pts[i+1]];
- const l1=Math.hypot(b[0]-a[0],b[1]-a[1]),l2=Math.hypot(c[0]-b[0],c[1]-b[1]),q=Math.min(r,l1/2,l2/2);
- d+=`L${b[0]-(b[0]-a[0])/l1*q} ${b[1]-(b[1]-a[1])/l1*q}Q${b[0]} ${b[1]} ${b[0]+(c[0]-b[0])/l2*q} ${b[1]+(c[1]-b[1])/l2*q}`}
- const z=pts[pts.length-1];return d+`L${z[0]} ${z[1]}`}
-function topDecor(o){const P=o=='P',S=SPOT[o],R=SR[o],off=OFF[o];let s=`<g transform="translate(${off},0)">`+netDecor(o);
- // dashed path in chronological order
- for(let k=1;k<8;k++){const a=S['c'+k],b=S['c'+(k+1)],way=ROUTE[o][k]||[];const p1=way[0]||b,pz=way[way.length-1]||a;
-  const da=Math.atan2(p1[1]-a[1],p1[0]-a[0]),db=Math.atan2(b[1]-pz[1],b[0]-pz[0]);
-  const st=[a[0]+Math.cos(da)*(R+6),a[1]+Math.sin(da)*(R+6)],en=[b[0]-Math.cos(db)*(R+8),b[1]-Math.sin(db)*(R+8)];
-  s+=curve(rp([st,...way,en],45),C.orange,P?5:4,'10 10')+arrow(en[0]-Math.cos(db)*16,en[1]-Math.sin(db)*16,en[0],en[1],{c:C.orange,w:P?5:4,h:12})}
- for(const c of TREE.kids){const p=S[c.id],x=p[0],y=p[1],nm=p[3]?c.short:c.short.replace('\n',' '),fs=P?22:17,nl=nm.split('\n').length;
-  let lx=x,ly=y,an='middle';if(p[2]=='r'){lx=x+R+12;ly=y+fs*.35;an='start'}else if(p[2]=='l'){lx=x-R-10;ly=y+fs*.35;an='end'}else if(p[2]=='b'){ly=y+R+fs+4}else{ly=y-R-10-(nl-1)*fs*1.18}
-  if(an!='middle')ly-=(nl-1)*fs*.59;
-  s+=`<g class="go" data-go="${c.id}">`+line(x+R*.72,y+R*.72,x+R*1.12,y+R*1.12,{c:C.blue,w:R*.16})+ell(x,y,R,R,{fill:'#fff',fo:1,c:C.blue,w:R*.09})+
-   ell(x-R*.72,y-R*.72,R*.32,R*.32,{fill:C.blue,fo:1,c:C.blue,w:2})+T(x-R*.72,y-R*.72+R*.13,String(c.num),{s:R*.38,a:'middle',c:'#fff',b:1})+
-   T(lx,ly,nm,{s:fs,a:an,c:C.blue,b:1})+`</g>`}
- return s+`</g>`}
+/* ================= full build: each challenge lives inside its own drawn object ================= */
+// style of the object that carries each challenge, and the fill of its paper/screen
+const STY={c1:'tag',c2:'screen',c3:'laptop',c4:'notice',c5:'hang',c6:'sticker',c7:'laptop',c8:'page'};
+const PFILL={tag:'#f6e8c0',screen:'#fbfdff',laptop:'#fbfdff',notice:'#fffef8',hang:'#fffef8',sticker:'#ffffff',page:'#ffffff'};
+// paper of a challenge, in its own frame units: big enough to cover the screen when the challenge fills it (desktop and phone)
+const PAPF={L:[-480,-135,2140,1175],P:[-80,-1100,1440,2400]};
+// where each paper sits at the top level (world units): [x,y,width]; extra anchor points for strings
+const SPEC={L:{
+ c1:{r:[600,505,31],knot:[596,489]},
+ c2:{r:[690,220,154]},
+ c3:{r:[1010,790,116]},
+ c4:{r:[468.6,465.8,32.75]},
+ c5:{r:[940,318,50],hook:[[946,292],[984,292]]},
+ c6:{r:[728.5,556,77]},
+ c7:{r:[1090,560,116]},
+ c8:{r:[1080,410,135]}},
+ P:{
+ c1:{r:[360,1215,24],knot:[372,1193]},
+ c2:{r:[600,950,66]},
+ c3:{r:[140,1975,62]},
+ c4:{r:[248,1146,14]},
+ c5:{r:[580,750,40],hook:[[586,0],[614,0]]},
+ c6:{r:[616,1312,34]},
+ c7:{r:[389,185,62]},
+ c8:{r:[389,437,62]}}};
+function pr(id,o){const r=SPEC[o][id].r,p=PAPF[o];return {x:r[0],y:r[1],w:r[2],h:r[2]*(p[3]-p[1])/(p[2]-p[0])}}
+function boxFor(id,o){const r=SPEC[o][id].r,p=PAPF[o],sc=r[2]/(p[2]-p[0]);return [r[0]-p[0]*sc,r[1]-p[1]*sc,1360*sc]}
+TREE.kids.forEach(c=>c.box={L:boxFor(c.id,'L'),P:boxFor(c.id,'P')});
+// tunnel curves (world units); hooks of the hanging label sit on them
+const TUN={L:[[851,255],[965,335],[1068,250]],P:[[640,943],[720,760],[538,712]]};
+function qb(p,t){const u=1-t;return [u*u*p[0][0]+2*u*t*p[1][0]+t*t*p[2][0],u*u*p[0][1]+2*u*t*p[1][1]+t*t*p[2][1]]}
+function onTun(o,x){const p=TUN[o];let best=null;for(let i=0;i<=400;i++){const q=qb(p,i/400);if(!best||Math.abs(q[0]-x)<Math.abs(best[0]-x))best=q}return best}
+/* light sketch strokes that stay tiny on tiny objects */
+const q2=v=>Math.round(v*100)/100;
+function rrp(x,y,w,h,r){return `M${q2(x+r)} ${q2(y)}H${q2(x+w-r)}Q${q2(x+w)} ${q2(y)} ${q2(x+w)} ${q2(y+r)}V${q2(y+h-r)}Q${q2(x+w)} ${q2(y+h)} ${q2(x+w-r)} ${q2(y+h)}H${q2(x+r)}Q${q2(x)} ${q2(y+h)} ${q2(x)} ${q2(y+h-r)}V${q2(y+r)}Q${q2(x)} ${q2(y)} ${q2(x+r)} ${q2(y)}Z`}
+function pth(d,fill,st,sw,ex){return `<path d="${d}" fill="${fill||'none'}" stroke="${st||'none'}" stroke-width="${q2(sw||0)}" stroke-linejoin="round" stroke-linecap="round" ${ex||''}/>`}
+function wob(pts,u,close){let d='';pts.forEach((p,i)=>{d+=(i?'L':'M')+q2(p[0]+J(u))+' '+q2(p[1]+J(u))});return d+(close?'Z':'')}
+/* decorations around a paper rect X,Y,W,H (world units). returns [back (under the paper), front (over it)] */
+function deco(id,o,X,Y,W,H){const s=STY[id],u=Math.min(W,H)/100,ink='#1e1e1e';let b='',f='';
+ if(s=='notice'){const k=W*.04;b+=pth(`M${q2(X+k*.8)} ${q2(Y+k*1.2)}L${q2(X+W+k)} ${q2(Y+k)}L${q2(X+W+k*.8)} ${q2(Y+H+k*1.15)}L${q2(X+k*.6)} ${q2(Y+H+k*.9)}Z`,'#3a3226','none',0,'fill-opacity=".22"');
+  b+=pth(`M${q2(X+W+k*.3)} ${q2(Y+k*1.5)}l${q2(k*.6)} ${q2(k*.2)}l${q2(-k*.1)} ${q2(H-k)}M${q2(X+k*1.5)} ${q2(Y+H+k*.3)}l${q2(W-k)} ${q2(k*.4)}`,'none',ink,W*.008,'stroke-opacity=".35"');
+  const cx=X+W/2,tw=W*.19,t0=W*.016,t1=W*.009;f+=pth(`M${q2(cx-tw/2)} ${q2(Y-t0)}L${q2(cx+tw/2)} ${q2(Y-t0*.8)}L${q2(cx+tw/2-t1*.3)} ${q2(Y+t1)}L${q2(cx-tw/2-t1*.2)} ${q2(Y+t1*.65)}Z`,'#f4e3a1','#c9b46a',W*.002,'fill-opacity=".85"')}
+ if(s=='screen'){const e=W*.045;b+=pth(rrp(X-e,Y-e,W+2*e,H+2*e*1.25,e*.7),'#3b4148',ink,W*.012);b+=ell(X+W+e*.55,Y+H+e*1.35,e*.13,e*.13,{fill:'#8ce99a',fo:1,c:'none'});
+  const cx=X+W/2,y1=Y+H+e*2.5;b+=pth(`M${q2(cx-W*.05)} ${q2(y1)}L${q2(cx-W*.06)} ${q2(y1+H*.16)}L${q2(cx+W*.06)} ${q2(y1+H*.16)}L${q2(cx+W*.05)} ${q2(y1)}Z`,'#868e96',ink,W*.009);
+  b+=pth(`M${q2(cx-W*.2)} ${q2(y1+H*.2)}Q${q2(cx)} ${q2(y1+H*.11)} ${q2(cx+W*.2)} ${q2(y1+H*.2)}L${q2(cx+W*.21)} ${q2(y1+H*.235)}H${q2(cx-W*.21)}Z`,'#adb5bd',ink,W*.009)}
+ if(s=='laptop'){const e=W*.04,L=W*.11,d=W*.085,yb=Y+H+e;b+=pth(rrp(X-e,Y-e,W+2*e,H+2*e,e*.8),'#ced4da',ink,W*.012)+ell(X+W/2,Y-e*.5,e*.12,e*.12,{fill:'#495057',fo:1,c:'none'});
+  b+=pth(`M${q2(X-e)} ${q2(yb)}L${q2(X+W+e)} ${q2(yb)}L${q2(X+W+e+L)} ${q2(yb+d)}L${q2(X-e-L)} ${q2(yb+d)}Z`,'#dee2e6',ink,W*.012);
+  for(let r=0;r<3;r++){const t=(r+1)/4.2,yy=yb+d*t,sx=X-e-L*t+W*.04,ex=X+W+e+L*t-W*.04;b+=pth(`M${q2(sx)} ${q2(yy)}H${q2(ex)}`,'none','#868e96',W*.007,`stroke-dasharray="${q2(W*.035)} ${q2(W*.012)}"`)}
+  b+=pth(rrp(X-e-L,yb+d,W+2*e+2*L,W*.025,W*.01),'#adb5bd',ink,W*.01)}
+ if(s=='page'){const e=W*.012,t=Math.min(H*.2,W*.2);b+=pth(rrp(X-e,Y-t,W+2*e,H+t+e,t*.25),'#e9ecef',ink,W*.012);
+  [C.red,C.orange,C.green].forEach((c,i)=>b+=ell(X+t*.4+i*t*.42,Y-t/2,t*.13,t*.13,{fill:c,fo:1,c:'none'}));
+  const ax=X+t*1.55,aw=W-t*1.85;b+=pth(rrp(ax,Y-t*.78,aw,t*.56,t*.2),'#fff','#adb5bd',W*.005);
+  if(aw>t*3)b+=`<text x="${q2(ax+t*.25)}" y="${q2(Y-t*.37)}" font-size="${q2(t*.34)}" fill="#495057" class="mono">arpadorovecz.github.io</text>`}
+ if(s=='tag'){const top=H>W*1.3,c='#b08a3e',P=PFILL.tag;let hole;
+  if(!top){const n=H*.42;b+=pth(`M${q2(X)} ${q2(Y)}H${q2(X+W)}V${q2(Y+H)}H${q2(X)}L${q2(X-n)} ${q2(Y+H*.72)}V${q2(Y+H*.28)}Z`,P,c,W*.02);hole=[X-n*.55,Y+H/2]}
+  else{const n=W*.42;b+=pth(`M${q2(X)} ${q2(Y)}L${q2(X+W*.28)} ${q2(Y-n)}H${q2(X+W*.72)}L${q2(X+W)} ${q2(Y)}V${q2(Y+H)}H${q2(X)}Z`,P,c,W*.02);hole=[X+W/2,Y-n*.55]}
+  const r=Math.min(W,H)*.075,k=SPEC[o][id].knot;b+=ell(hole[0],hole[1],r*1.7,r*1.7,{fill:'#e0c27a',fo:1,c:'none'})+ell(hole[0],hole[1],r,r,{fill:'#fbfaf5',fo:1,c:'none'});
+  b+=pth(`M${q2(hole[0])} ${q2(hole[1])}Q${q2((hole[0]+k[0])/2+r*3)} ${q2((hole[1]+k[1])/2)} ${q2(k[0])} ${q2(k[1]+r*1.2)}`,'none','#7a5c2e',r*.55)+ell(k[0],k[1],r*3.2,r*2.2,{c:'#7a5c2e',w:r*.55})}
+ if(s=='hang'){const k=W*.03,hk=SPEC[o][id].hook.map(h=>onTun(o,h[0])),a=[X+W*.12,Y+W*.06],c2=[X+W*.88,Y+W*.06];
+  b+=pth(`M${q2(X+k)} ${q2(Y+k*1.4)}H${q2(X+W+k)}V${q2(Y+H+k*1.2)}H${q2(X+k)}Z`,'#3a3226','none',0,'fill-opacity=".18"');
+  b+=pth(`M${q2(hk[0][0])} ${q2(hk[0][1])}L${q2(a[0])} ${q2(a[1])}M${q2(hk[1][0])} ${q2(hk[1][1])}L${q2(c2[0])} ${q2(c2[1])}`,'none','#5c5647',W*.012);
+  f+=ell(a[0],a[1],W*.018,W*.018,{c:'#5c5647',w:W*.008})+ell(c2[0],c2[1],W*.018,W*.018,{c:'#5c5647',w:W*.008})}
+ if(s=='sticker'){const k=W*.06;b+=pth(`M${q2(X+W-k*1.2)} ${q2(Y+H)}L${q2(X+W+k*.35)} ${q2(Y+H+k*.55)}L${q2(X+W)} ${q2(Y+H-k*1.1)}Z`,'#e9ecef','#868e96',W*.008)}
+ return [b,f]}
+function paperStroke(id){return {notice:['#6b6455',.004],hang:['#5c5647',.008],sticker:['#9775fa',.01],page:['#adb5bd',.004],screen:['#212529',.006],laptop:['#495057',.006],tag:['#b08a3e',.012]}[STY[id]]}
+function topDecor(o){const P=o=='P';let s=netDecor(o);
+ const B={L:{c1:[648,513],c2:[674,206],c3:[996,778],c4:[517,452],c5:[922,338],c6:[840,555],c7:[1074,550],c8:[1064,390]},
+  P:{c1:[400,1225],c2:[582,935],c3:[120,1965],c4:[284,1140],c5:[640,770],c6:[680,1300],c7:[368,175],c8:[368,420]}}[o];
+ const H={L:{c1:['line',552,504,640,474],c4:['rect',378,458,172,118],c5:['tun'],c6:['rect',711,505,112,125]},
+  P:{c1:['line',322,1204,420,1184],c4:['rect',148,1148,172,118],c5:['tun'],c6:['rect',603,1288,60,125]}}[o];
+ const t=TUN[o];
+ for(const id in H){const h=H[id],c=BY[id];
+  const hs=h[0]=='rect'?`<rect x="${h[1]}" y="${h[2]}" width="${h[3]}" height="${h[4]}" fill="#fff" fill-opacity=".001"/>`:h[0]=='line'?`<path d="M${h[1]} ${h[2]}L${h[3]} ${h[4]}" stroke="#fff" stroke-opacity=".001" stroke-width="30" fill="none"/>`:`<path d="M${t[0][0]} ${t[0][1]}Q${t[1][0]} ${t[1][1]} ${t[2][0]} ${t[2][1]}" stroke="#fff" stroke-opacity=".001" stroke-width="30" fill="none"/>`;
+  s+=`<g class="go" data-go="${id}" data-name="${c.title}">${hs}</g>`}
+ for(const id in B){const q=B[id],R=P?17:13;s+=`<g class="go" data-go="${id}" data-name="${BY[id].title}">`+ell(q[0],q[1],R,R,{fill:C.blue,fo:1,c:C.blue,w:2})+T(q[0],q[1]+R*.42,String(BY[id].num),{s:R*1.2,a:'middle',c:'#fff',b:1})+`</g>`}
+ return s}
 
+function cylinder(cx,top,rx,ry,h,w){return `<path d="M${cx-rx} ${top}V${top+h}Q${cx} ${top+h+ry*2.2} ${cx+rx} ${top+h}V${top}" fill="${C.lav}" fill-opacity=".55" stroke="#1e1e1e" stroke-width="${w}" stroke-linejoin="round"/>`+ell(cx,top,rx,ry,{fill:'#e5dbff',fo:1,w:w})}
+function tunnel(o,w,dash){const t=TUN[o];return curve(`M${t[0][0]} ${t[0][1]}Q${t[1][0]} ${t[1][1]} ${t[2][0]} ${t[2][1]}`,C.green,w,dash)}
 function netDecor(o){let s='';const G=C.grey;
  if(o=='L'){
   s+=T(40,60,'My SQL-injection lab',{s:40,b:1})+T(42,100,'The lab network, and the path a teacher uses to reach it from outside.',{s:22,c:G});
-  s+=lab(40,140,800,660,'')+T(110,180,'The closed lab: four virtual computers on the school\'s server. Only people with a school login get in.',{s:19,c:C.blue,b:1})+`<text x="110" y="792" font-size="15" fill="#868e96">Names: <tspan class="term" data-k="educloud">EduCloud</tspan> (the school\'s server) · <tspan class="term" data-k="gns3">GNS3</tspan> (builds the virtual network) · <tspan class="term" data-k="vpn">VPN</tspan> (the school login)</text>`;
-  s+=kaliPC(100,440,150)+person(175,410,52,C.ink,1)+T(175,605,'The attacker\'s computer',{s:21,a:'middle',b:1})+T(175,630,'Kali',{s:17,a:'middle',c:G,term:'kali'});
-  s+=bricks(345,440,3,4,42,28)+T(420,600,'The firewall between',{s:21,a:'middle',b:1})+T(420,623,'the networks',{s:21,a:'middle',b:1})+T(420,647,'pfSense firewall',{s:17,a:'middle',c:G,term:'pfsense'});
-  s+=websrv(565,250,170)+T(650,400,'Runs the website',{s:21,a:'middle',b:1})+T(650,424,'Ubuntu-3 (web server)',{s:17,a:'middle',c:G,term:'ubuntu-3'});
-  s+=dbi(650,560,100)+T(650,690,'Stores the user list',{s:21,a:'middle',b:1})+T(650,714,'Ubuntu-1 (database)',{s:17,a:'middle',c:G,term:'ubuntu-1'});
-  s+=line(268,485,338,485,{w:5})+line(440,436,565,345,{w:5})+line(495,540,592,600,{w:5});
-  s+=line(650,442,650,545,{c:C.purple,w:4,dash:'8 10'})+T(662,478,'The website\nasks the\ndatabase.',{s:17,c:C.purple});
-  s+=T(110,764,'The attacker\'s network',{s:19,c:G,b:1})+T(320,764,'LAN1',{s:16,c:G,term:'lan1'})+T(520,764,'The servers\' network',{s:19,c:G,b:1})+T(712,764,'LAN2',{s:16,c:G,term:'lan2'});
-  s+=cloudF(1060,210,230,22)+T(1185,190,'An outside service that',{s:19,b:1})+T(1185,213,'passes visitors through',{s:19,b:1})+T(1185,236,'to the lab',{s:19,b:1});s+=linkF(990,410,140)+T(1145,438,'A web page with a link',{s:19,b:1})+T(1145,461,'that never changes',{s:19,b:1})+T(1145,486,'GitHub Pages',{s:16,c:G,term:'github pages'});
-  s+=laptop2(1000,640,120)+T(1060,770,"Teacher's laptop",{s:22,a:'middle',b:1});
-  s+=curve('M740 290 Q820 215 935 212',C.green,6,'4 12')+arrow(915,213,937,212,{c:C.green,w:6,h:16})+T(850,128,'The web server opens the tunnel from inside.',{s:17,c:C.green,b:1});
-  s+=arrow(1060,630,1060,562,{w:5,h:16})+T(1078,592,'The teacher opens\nthe permanent link.',{s:17,c:G})+arrow(1060,400,1060,262,{w:5,h:16})+T(1078,320,'It forwards them\nto the tunnel.',{s:17,c:G});
+  s+=lab(40,140,860,790,'')+`<text x="62" y="178" font-size="19" font-weight="700" fill="${C.blue}">The closed lab: four <tspan class="term" data-k="gns3">virtual computers</tspan> on the <tspan class="term" data-k="educloud">school\'s server</tspan>.</text><text x="62" y="202" font-size="19" font-weight="700" fill="${C.blue}">Only people with a <tspan class="term" data-k="vpn">school login</tspan> get in.</text>`;
+  s+=kaliPC(95,470,150)+person(170,440,52,C.ink,1)+NL(170,640,'Attacker','Kali','kali','The attacker\'s computer',{a:'middle'});
+  s+=bricks(380,460,3,4,42,28)+NL(464,615,'Firewall','pfSense','pfsense','Stands between\nthe two networks',{a:'middle'});
+  s+=NL(672,250,'Web server','Ubuntu-3','ubuntu-3','Runs the website',{a:'end'});
+  s+=cylinder(767,525,56,16,100,4)+NL(767,672,'Database','Ubuntu-1','ubuntu-1','Stores the user list',{a:'middle'});
+  s+=line(255,520,375,520,{w:5});
+  s+=line(552,500,640,470,{w:4})+line(552,508,640,478,{w:4})+line(640,470,737,330,{w:4})+line(640,478,711,575,{w:4});
+  s+=line(767,335,767,490,{c:C.purple,w:4,dash:'8 10'})+arrow(767,484,767,503,{c:C.purple,w:4,h:13})+T(780,410,'The website\nasks the\ndatabase.',{s:17,c:C.purple});
+  s+=T(70,760,'The attacker\'s network',{s:16,c:G,b:1})+T(70,782,'LAN1',{s:16,c:G,term:'lan1'})+T(560,760,'The servers\' network',{s:16,c:G,b:1})+T(560,782,'LAN2',{s:16,c:G,term:'lan2'});
+  s+=cloudF(1180,235,230,22)+T(1305,214,'An outside\nservice that\npasses visitors\nthrough to the lab',{s:16,c:'#495057'});
+  s+=NL(1232,428,'Link page','GitHub Pages','github pages','A web page with\na link that\nnever changes');
+  s+=T(1148,668,"Teacher's laptop",{s:22,a:'middle',b:1});
+  s+=tunnel(o,6,'4 12')+arrow(1046,262,1068,250,{c:C.green,w:6,h:15})+T(842,180,'The web server opens the tunnel from inside.',{s:17,c:C.green,b:1});
+  s+=arrow(1148,553,1148,484,{w:5,h:15})+T(1133,512,'The teacher opens\nthe permanent link.',{s:17,c:G,a:'end'})+arrow(1150,382,1162,292,{w:5,h:15})+T(1138,332,'It forwards them\nto the tunnel.',{s:17,c:G,a:'end'});
+  s+=line(1000,820,925,820,{c:C.grey,w:3,dash:'5 6'})+arrow(930,820,906,820,{c:C.grey,w:3,h:11})+T(1068,900,'My own laptop',{s:21,a:'middle',b:1})+T(1068,922,'Connects into the lab',{s:16,a:'middle',c:'#495057'});
  }else{
   s+=T(30,62,'My SQL-injection lab',{s:46,b:1})+T(30,108,'The lab network, and the path a teacher\nuses to reach it from outside.',{s:26,c:G});
-  s+=laptop2(500,190,120)+T(560,320,"Teacher's laptop",{s:28,a:'middle',b:1});
-  s+=linkF(490,390,140)+T(694,418,'A web page',{s:20,b:1})+T(694,442,'with a link',{s:20,b:1})+T(694,466,'that never',{s:20,b:1})+T(694,490,'changes',{s:20,b:1})+T(694,516,'GitHub Pages',{s:16,c:G,term:'github pages'});
-  s+=cloudF(560,640,250,28)+T(425,618,'An outside service',{s:19,b:1,a:'end'})+T(425,640,'that passes visitors',{s:19,b:1,a:'end'})+T(425,662,'through to the lab',{s:19,b:1,a:'end'});
-  s+=arrow(560,335,560,385,{w:5,h:16})+T(540,350,'The teacher opens\nthe permanent link.',{s:22,c:G,a:'end'})+arrow(560,548,560,590,{w:5,h:16})+T(540,560,'It forwards them\nto the tunnel.',{s:22,c:G,a:'end'});
-  s+=lab(70,740,700,1220,'');s+=T(95,1880,'The closed lab: four virtual computers on the\nschool\'s server. Only people with a school login get in.',{s:20,c:C.blue,b:1})+`<text x="95" y="1930.0" font-size="15" fill="#868e96">Names: <tspan class="term" data-k="educloud">EduCloud</tspan> (the school\'s server) · <tspan class="term" data-k="gns3">GNS3</tspan> (builds the</text>`+`<text x="95" y="1948.75" font-size="15" fill="#868e96">virtual network) · <tspan class="term" data-k="vpn">VPN</tspan> (the school login)</text>`;
-  s+=curve('M560 795 L560 700',C.green,7,'4 14')+arrow(560,712,560,690,{c:C.green,w:6,h:18})+T(540,715,'The web server opens\nthe tunnel from inside.',{s:22,c:C.green,b:1,a:'end'});
-  s+=websrv(475,800,170)+T(560,955,'Runs the website',{s:27,a:'middle',b:1})+T(560,983,'Ubuntu-3 (web server)',{s:20,a:'middle',c:G,term:'ubuntu-3'});
-  s+=dbi(560,1240,110)+T(560,1385,'Stores the user list',{s:27,a:'middle',b:1})+T(560,1413,'Ubuntu-1 (database)',{s:20,a:'middle',c:G,term:'ubuntu-1'});
-  s+=line(560,1005,560,1220,{c:C.purple,w:4,dash:'8 10'})+T(575,1085,'The website\nasks the\ndatabase.',{s:22,c:C.purple});
-  s+=bricks(160,1100,3,4,42,28)+T(235,1255,'The firewall between',{s:25,a:'middle',b:1})+T(235,1283,'the networks',{s:25,a:'middle',b:1})+T(235,1310,'pfSense firewall',{s:20,a:'middle',c:G,term:'pfsense'});
-  s+=kaliPC(160,1500,150)+person(235,1470,52,C.ink,1)+T(235,1665,'The attacker\'s computer',{s:27,a:'middle',b:1})+T(235,1693,'Kali',{s:20,a:'middle',c:G,term:'kali'});
-  s+=line(235,1405,235,1328,{w:5})+line(310,1110,470,905,{w:5})+line(310,1185,500,1270,{w:5});
-  s+=T(100,1790,'The attacker\'s network',{s:24,c:G,b:1})+T(100,1818,'LAN1',{s:19,c:G,term:'lan1'})+T(590,1475,'The servers\'\nnetwork',{s:24,c:G,b:1})+T(590,1533,'LAN2',{s:19,c:G,term:'lan2'});
+  s+=T(480,262,"Teacher's laptop",{s:28,b:1});
+  s+=arrow(420,352,420,410,{w:5,h:16})+T(392,378,'The teacher opens\nthe permanent link.',{s:19,c:G,a:'end'});
+  s+=T(480,470,'Link page',{s:28,b:1})+T(480,500,'GitHub Pages',{s:20,c:'#495057',term:'github pages'})+T(480,532,'A web page with\na link that\nnever changes',{s:20,c:'#495057'});
+  s+=arrow(420,597,420,642,{w:5,h:16})+T(392,618,'It forwards them\nto the tunnel.',{s:19,c:G,a:'end'});
+  s+=cloudF(420,700,240,28)+T(290,692,'An outside service\nthat passes visitors\nthrough to the lab',{s:19,c:'#495057',a:'end'});
+  s+=lab(40,850,720,1060,'');
+  s+=tunnel(o,7,'4 14')+arrow(556,716,538,712,{c:C.green,w:6,h:16})+T(565,800,'The web server opens\nthe tunnel from inside.',{s:21,c:C.green,b:1,a:'end'});
+  s+=NL(585,1000,'Web server','Ubuntu-3','ubuntu-3','Runs the website',{s:27,ss:20,a:'end'});
+  s+=cylinder(633,1300,28,9,105,3)+NL(752,1455,'Database','Ubuntu-1','ubuntu-1','Stores the user list',{s:27,ss:20,a:'end'});
+  s+=line(633,1135,633,1275,{c:C.purple,w:4,dash:'8 10'})+arrow(633,1270,633,1287,{c:C.purple,w:4,h:12})+T(648,1190,'The website\nasks the\ndatabase.',{s:18,c:C.purple});
+  s+=bricks(150,1150,3,4,42,28)+NL(130,1305,'Firewall','pfSense','pfsense','Stands between\nthe two networks',{s:27,ss:20});
+  s+=kaliPC(60,1560,150)+person(135,1530,52,C.ink,1)+NL(135,1740,'Attacker','Kali','kali','The attacker\'s computer',{a:'middle',s:27,ss:20});
+  s+=line(95,1553,95,1215,{w:5})+line(95,1215,146,1215,{w:5});
+  s+=line(322,1200,420,1180,{w:4})+line(322,1208,420,1188,{w:4})+line(420,1180,606,1128,{w:4})+line(420,1188,605,1330,{w:4});
+  s+=T(300,1610,'The attacker\'s network',{s:22,c:G,b:1})+T(300,1636,'LAN1',{s:19,c:G,term:'lan1'})+T(480,1560,'The servers\' network',{s:22,c:G,b:1})+T(480,1586,'LAN2',{s:19,c:G,term:'lan2'});
+  s+=`<text x="62" y="1856" font-size="20" font-weight="700" fill="${C.blue}">The closed lab: four <tspan class="term" data-k="gns3">virtual computers</tspan> on the</text>`+`<text x="62" y="1882" font-size="20" font-weight="700" fill="${C.blue}"><tspan class="term" data-k="educloud">school\'s server</tspan>. Only people with a <tspan class="term" data-k="vpn">school login</tspan> get in.</text>`;
+  s+=line(171,1966,171,1930,{c:C.grey,w:3,dash:'5 6'})+arrow(171,1934,171,1913,{c:C.grey,w:3,h:12})+T(240,2030,'My own laptop',{s:27,b:1})+T(240,2062,'Connects into the lab',{s:20,c:'#495057'});
  }
  return s}
 
@@ -451,36 +516,50 @@ function renderFrame(n){let s=n.decor?n.decor(oF(n)):'';(n.kids||[]).forEach(k=>
 /* level of detail: a node's own fine drawing (.in) fades in as the node grows on screen; its outline/panel (.sk) and, for challenges, its zones stay */
 const LOD={story:[260,460],problem:[70,150],fix:[70,150],result:[70,150]},LODd=[110,220];
 function renderNode(k){const b=bx(k),f=fr(k),sc=b.w/f[0];seed=k.id.length*977+Math.round(b.x)+7;k.lod=LOD[k.kind]&&!k.deep?LOD[k.kind]:LODd;
- let s=`<g class="node" data-id="${k.id}" transform="translate(${b.x} ${b.y}) scale(${sc})">`;
- s+=k.flat?`<rect width="${f[0]}" height="${f[1]}" fill="#fff" fill-opacity=".001"/>`:`<rect width="${f[0]}" height="${f[1]}" rx="${f[0]*.012}" fill="#fffef8" stroke="${KC[k.kind]}" stroke-width="${k.num?5:7}"/>`;
+ let s=`<g class="node" data-id="${k.id}" transform="${ROTS[k.id]!==undefined&&k.parent===TREE?`rotate(${ROTS[k.id]} ${b.x+b.w/2} ${b.y+b.h/2}) `:''}translate(${b.x} ${b.y}) scale(${sc})">`;
+ s+=k.flat?`<rect width="${f[0]}" height="${f[1]}" fill="#fff" fill-opacity=".001"/>`:`<rect width="${f[0]}" height="${f[1]}" rx="${f[0]*.012}" fill="#fffef8" stroke="${k.num?'#6b6455':KC[k.kind]}" stroke-width="${k.num?4:7}"/>`;const obj=STY[k.id]&&k.parent===TREE;if(obj)s=s.replace(/<rect width[^>]*\/>$/,`<g class="go obj" data-go="${k.id}" data-name="${k.title}"><g id="bk-${k.id}"></g><rect id="pp-${k.id}" fill="${PFILL[STY[k.id]]}"/></g>`);
  if(k.flat){seed=k.id.length*977+3;s+=`<g class="sk">${_zb(k.kind)}</g>`}
  NOZB=!!k.flat;const dec=k.decor?k.decor(oF(k)):'';NOZB=false;let kids='';(k.kids||[]).forEach(x=>kids+=renderNode(x));
- s+=k.num?`<g class="in">${dec}</g>${kids}</g>`:`<g class="in">${dec}${kids}</g></g>`;
+ s+=k.num?`<g class="in">${dec}</g>${kids}${obj?`<g id="fr-${k.id}" pointer-events="none"></g>`:''}</g>`:`<g class="in">${dec}${kids}</g></g>`;
  if(k.deep)s+=deepLabel(k,b);return s}
 const selEl=document.getElementById('sel'),hovEl=document.getElementById('hov'),hovTip=document.getElementById('hovtip');let hovN=null;
 const world=document.getElementById('world'),svg=document.getElementById('cv'),maskEl=document.getElementById('mask'),noteEl=document.getElementById('note');
 function abs(n){if(!n.parent){const f=fr(n);return {x:0,y:0,w:f[0],h:f[1]}}const P=n.parent.A,k=P.w/fr(n.parent)[0],b=bx(n);return {x:P.x+b.x*k,y:P.y+b.y*k,w:b.w*k,h:b.h*k}}
+/* objects hung at an angle (tag, notice, label, sticker): the tilt straightens as you zoom into them */
+const ROTS={c1:7,c4:-3,c5:-4,c6:-2};
+const rv=(r,p)=>{const dx=p[0]-r.RC[0],dy=p[1]-r.RC[1];return [r.RC[0]+dx*r.RCS-dy*r.RSN,r.RC[1]+dx*r.RSN+dy*r.RCS]},ri=(r,p)=>{const dx=p[0]-r.RC[0],dy=p[1]-r.RC[1];return [r.RC[0]+dx*r.RCS+dy*r.RSN,r.RC[1]-dx*r.RSN+dy*r.RCS]};
+const corners=A=>[[A.x,A.y],[A.x+A.w,A.y],[A.x+A.w,A.y+A.h],[A.x,A.y+A.h]];
 function build(){O=innerWidth<innerHeight*0.9?'P':'L';world.innerHTML=renderFrame(TREE);
- TREE.A=abs(TREE);NODES.forEach(n=>{n.A=abs(n);n.g=world.querySelector(`.node[data-id="${n.id}"]`);n.inG=n.g.querySelector(':scope>.in');n.vis=1;n.det=1;n.op=1});FK=new Map()}
+ TREE.A=abs(TREE);NODES.forEach(n=>{n.A=abs(n);n.g=world.querySelector(`.node[data-id="${n.id}"]`);n.inG=n.g.querySelector(':scope>.in');n.vis=1;n.det=1;n.op=1});FK=new Map();paper();for(const id in ROTS){const r=BY[id];r.RB='';r.RD=ROTS[id];r.RCS=Math.cos(r.RD*Math.PI/180);r.RSN=Math.sin(r.RD*Math.PI/180);r.RC=[r.A.x+r.A.w/2,r.A.y+r.A.h/2]}NODES.forEach(n=>{n.rr=null;for(let q=n;q;q=q.parent)if(ROTS[q.id]!==undefined&&q.parent===TREE)n.rr=q});FK=new Map()}
 /* ---------- camera: screen = (world - cam) * k ---------- */
 let cam={x:0,y:0,k:1},VW=innerWidth,VH=innerHeight,anim=null,cur=TREE,flying=false,FK=new Map();
-const ph=()=>VW<=720,collapsed=()=>document.body.classList.contains('nc');
+let NCF=null;const ph=()=>VW<=720,collapsed=()=>NCF!==null?NCF:document.body.classList.contains('nc');
 function fitArea(){if(ph()){const nh=collapsed()?44:noteEl.offsetHeight+16;return {x:8,y:58,w:VW-16,h:Math.max(120,VH-58-nh)}}
  return {x:16,y:62,w:VW-32-(!collapsed()&&VW>900?360:0),h:VH-78}}
-function camFor(n){const a=n.A,F=fitArea();
+function camFor(n){let a=n.A;const F=fitArea();if(false){const c=corners(a).map(rv),xs=c.map(p=>p[0]),ys=c.map(p=>p[1]),x0=Math.min(...xs),y0=Math.min(...ys);a={x:x0,y:y0,w:Math.max(...xs)-x0,h:Math.max(...ys)-y0}}
  if(n.fitW&&n.fitW[O]){const k=F.w/(a.w*1.03);if(a.h*k<=F.h)return {k,x:a.x+a.w/2-(F.x+F.w/2)/k,y:a.y+a.h/2-(F.y+F.h/2)/k};return {k,x:a.x+a.w/2-(F.x+F.w/2)/k,y:a.y-(F.y+6)/k}}
  const pad=n.parent?1.04:1.02,k=Math.min(F.w/(a.w*pad),F.h/(a.h*pad));return {k,x:a.x+a.w/2-(F.x+F.w/2)/k,y:a.y+a.h/2-(F.y+F.h/2)/k}}
 function fitK(n){let v=FK.get(n);if(v===undefined){v=camFor(n).k;FK.set(n,v)}return v}
 const rOf=n=>cam.k/fitK(n);
 function center(){const F=fitArea();return [cam.x+(F.x+F.w/2)/cam.k,cam.y+(F.y+F.h/2)/cam.k]}
-function inside(n,m,c){const A=n.A;c=c||center();return c[0]>=A.x-A.w*m&&c[0]<=A.x+A.w*(1+m)&&c[1]>=A.y-A.h*m&&c[1]<=A.y+A.h*(1+m)}
+function inside(n,m,c){const A=n.A;c=c||center();if(n.rr)c=ri(n.rr,c);return c[0]>=A.x-A.w*m&&c[0]<=A.x+A.w*(1+m)&&c[1]>=A.y-A.h*m&&c[1]<=A.y+A.h*(1+m)}
 const sm=t=>t<=0?0:t>=1?1:t*t*(3-2*t);
-function outl(el,n,pad){if(!n||!n.parent){el.setAttribute('d','');return}const A=n.A,K=cam.k,x=(A.x-cam.x)*K-pad,y=(A.y-cam.y)*K-pad,w=A.w*K+2*pad,h=A.h*K+2*pad,f=v=>Math.round(v*10)/10;el.setAttribute('d',`M${f(x)} ${f(y)}h${f(w)}v${f(h)}h${f(-w)}Z`)}
-function apply(){const k=cam.k;world.setAttribute('transform',`matrix(${k} 0 0 ${k} ${-cam.x*k} ${-cam.y*k})`);cull();mask();outl(selEl,cur,4);outl(hovEl,hovN,2);if(!flying)autoCur()}
+function outl(el,n,pad){if(!n||!n.parent){el.setAttribute('d','');return}if(n.rr){const A=n.A,pw=pad/cam.k,c=corners({x:A.x-pw,y:A.y-pw,w:A.w+2*pw,h:A.h+2*pw}).map(p=>rv(n.rr,p)).map(p=>[(p[0]-cam.x)*cam.k,(p[1]-cam.y)*cam.k]),f=v=>Math.round(v*10)/10;el.setAttribute('d','M'+c.map(p=>f(p[0])+' '+f(p[1])).join('L')+'Z');return}const A=n.A,K=cam.k,x=(A.x-cam.x)*K-pad,y=(A.y-cam.y)*K-pad,w=A.w*K+2*pad,h=A.h*K+2*pad,f=v=>Math.round(v*10)/10;el.setAttribute('d',`M${f(x)} ${f(y)}h${f(w)}v${f(h)}h${f(-w)}Z`)}
+/* each challenge's paper (sheet, screen, tag...) covers the whole screen when the challenge fills it; the object around it is drawn just outside */
+function paper(){const q=v=>Math.round(v*100)/100,$=id=>document.getElementById(id);
+ for(const id in STY){const r=BY[id];if(!r||!r.g)continue;const f=fr(r),A=r.A,sc=A.w/f[0];let [x0,y0,x1,y1]=PAPF[O];
+  for(const nc of [false,true]){NCF=nc;FK=new Map();const c=camFor(r),a=(c.x-A.x)/sc,b=(c.y-A.y)/sc,w=VW/c.k/sc,h=VH/c.k/sc,m=.012*w;x0=Math.min(x0,a-m);y0=Math.min(y0,b-m);x1=Math.max(x1,a+w+m);y1=Math.max(y1,b+h+m)}NCF=null;FK=new Map();
+  const P=$('pp-'+id),st=paperStroke(id);P.setAttribute('x',q(x0));P.setAttribute('y',q(y0));P.setAttribute('width',q(x1-x0));P.setAttribute('height',q(y1-y0));P.setAttribute('rx',q((x1-x0)*.006));P.setAttribute('stroke',st[0]);P.setAttribute('stroke-width',q(st[1]*(x1-x0)));
+  seed=id.charCodeAt(1)*131+7;const d=deco(id,O,A.x+x0*sc,A.y+y0*sc,(x1-x0)*sc,(y1-y0)*sc),tr=`scale(${1/sc}) translate(${-A.x} ${-A.y})`;
+  $('bk-'+id).innerHTML=`<g transform="${tr}">${d[0]}</g>`;$('fr-'+id).innerHTML=`<g transform="${tr}">${d[1]}</g>`}}
+function tilt(){const k0=fitK(TREE);for(const id in ROTS){const r=BY[id];if(!r||!r.g)continue;const k1=fitK(r);let p=Math.log(cam.k/k0)/Math.log(k1/k0);p=Math.max(0,Math.min(1,p));p=p*p*(3-2*p);const d=ROTS[id]*(1-p);if(Math.abs(d-r.RD)<1e-4&&r.RB)continue;r.RD=d;r.RCS=Math.cos(d*Math.PI/180);r.RSN=Math.sin(d*Math.PI/180);
+ if(!r.RB)r.RB=r.g.getAttribute('transform').replace(/^rotate\([^)]*\)\s*/,'');r.g.setAttribute('transform',`rotate(${Math.round(d*1e4)/1e4} ${r.RC[0]} ${r.RC[1]}) `+r.RB)}}
+function apply(){const k=cam.k;tilt();world.setAttribute('transform',`matrix(${k} 0 0 ${k} ${-cam.x*k} ${-cam.y*k})`);cull();mask();outl(selEl,cur,4);if(!outlObj())outl(hovEl,hovN,2);if(!flying)autoCur()}
 function cull(){const k=cam.k;for(const n of NODES){const A=n.A,sx=(A.x-cam.x)*k,sy=(A.y-cam.y)*k,sw=A.w*k,sh=A.h*k;
- const v=(sx<VW&&sx+sw>0&&sy<VH&&sy+sh>0)?1:0;if(v!==n.vis){n.vis=v;n.g.style.display=v?'':'none'}
- const L=n.lod,op=sw<=L[0]?0:sw>=L[1]?1:Math.round((sw-L[0])/(L[1]-L[0])*20)/20;if(op!==n.op){n.op=op;n.inG.style.display=op?'':'none';n.inG.style.opacity=op<1?op:''}}}
-function mask(){let c=TREE,best=null,m=0;const ce=center();
+ /* demo2: no off-screen culling either */
+ /* demo2: no level-of-detail fades: everything is always drawn */
+}}
+function mask(){maskEl.setAttribute('d','');HOLE=null;return;let c=TREE,best=null,m=0;const ce=center();
  for(;;){const k=(c.kids||[]).find(x=>inside(x,0,ce));if(!k)break;if(!k.flat){const v=sm((rOf(k)-.72)/.23);if(v>0.01){best=k;m=v}}c=k}
  if(!best){maskEl.setAttribute('d','');HOLE=null;return}
  const A=best.A,K=cam.k,x=(A.x-cam.x)*K,y=(A.y-cam.y)*K,w=A.w*K,h=A.h*K,f=v=>Math.round(v*10)/10;
@@ -489,7 +568,7 @@ let HOLE=null;
 /* level from position, with hysteresis: enter at 97% of a node's fit, leave below 85% */
 let curT=null;
 function computeCur(){const chain=new Set();for(let p=cur;p;p=p.parent)chain.add(p);let c=TREE;const ce=center();
- for(;;){let nx=null;for(const k of c.kids||[]){const r=rOf(k);if(chain.has(k)?(r>=.85&&inside(k,.08,ce)):(r>=.97&&inside(k,0,ce))){nx=k;break}}if(!nx)break;c=nx}return c}
+ for(;;){let nx=null;for(const k of c.kids||[]){const r=rOf(k);if(chain.has(k)?(r>=.85&&inside(k,.08,ce)):(r>=.97&&inside(k,k.parent===TREE&&STY[k.id]?.05:0,ce))){nx=k;break}}if(!nx)break;c=nx}return c}
 function autoCur(){const c=computeCur();clearTimeout(curT);if(c!==cur)curT=setTimeout(()=>{if(!flying&&computeCur()===c)setCur(c)},140)}
 /* smooth zoom-out-pan-zoom-in flight (van Wijk & Nuij), centred on the fit area */
 function interp(p0,p1){const rho=1.4,r2=rho*rho,r4=r2*r2,[ux0,uy0,w0]=p0,[ux1,uy1,w1]=p1,dx=ux1-ux0,dy=uy1-uy0,d2=dx*dx+dy*dy;let S,f;
@@ -525,7 +604,7 @@ function setCollapsed(v){const wasFit=isFit(cur);document.body.classList.toggle(
 document.getElementById('notetab').onclick=()=>setCollapsed(false);
 /* ---------- input ---------- */
 const ptr=new Map();let dragged=false,start=null,pinch=null;
-function hide(){document.getElementById('hint').classList.add('gone')}
+function hide(){}
 function clampK(k){const lo=fitK(TREE)*.6;let hi=0;NODES.forEach(n=>hi=Math.max(hi,fitK(n)));return Math.max(lo,Math.min(hi*2.5,k))}
 function clampPan(){const F=fitArea(),A=TREE.A,c=center(),ux=Math.max(A.x,Math.min(A.x+A.w,c[0])),uy=Math.max(A.y,Math.min(A.y+A.h,c[1]));cam.x=ux-(F.x+F.w/2)/cam.k;cam.y=uy-(F.y+F.h/2)/cam.k}
 function zoomAt(sx,sy,k){k=clampK(k);const wx=cam.x+sx/cam.k,wy=cam.y+sy/cam.k;cam={k,x:wx-sx/k,y:wy-sy/k};clampPan();apply()}
@@ -536,20 +615,24 @@ svg.addEventListener('pointermove',e=>{if(!ptr.size&&e.pointerType=='mouse'&&!fl
   const k=clampK(pinch.cam.k*d/pinch.d),wx=pinch.cam.x+pinch.m[0]/pinch.cam.k,wy=pinch.cam.y+pinch.m[1]/pinch.cam.k;cam={k,x:wx-m[0]/k,y:wy-m[1]/k};clampPan();apply();hide()}
  else if(ptr.size==1&&start){const dx=e.clientX-start[0],dy=e.clientY-start[1];if(!dragged&&Math.hypot(dx,dy)>6){dragged=true;svg.classList.add('drag');setHover(null);hide()}
   if(dragged){cam.x=start[2]-dx/cam.k;cam.y=start[3]-dy/cam.k;clampPan();apply()}}});
-function chainAt(wx,wy){const ch=[TREE];let c=TREE;for(;;){const k=(c.kids||[]).find(n=>{const A=n.A;return wx>=A.x&&wx<=A.x+A.w&&wy>=A.y&&wy<=A.y+A.h});if(!k)break;ch.push(k);c=k}return ch}
+function chainAt(WX,WY){const ch=[TREE];let c=TREE;for(;;){const k=(c.kids||[]).find(n=>{const A=n.A;const [wx,wy]=n.rr?ri(n.rr,[WX,WY]):[WX,WY];return wx>=A.x&&wx<=A.x+A.w&&wy>=A.y&&wy<=A.y+A.h});if(!k)break;ch.push(k);c=k}return ch}
 function isAnc(a,b){for(let p=b;p;p=p.parent)if(p===a)return true;return false}
 function targetAt(x,y){if(HOLE&&(x<HOLE[0]||y<HOLE[1]||x>HOLE[0]+HOLE[2]||y>HOLE[1]+HOLE[3]))return null;/* faded paper: only drag */
  const el=document.elementFromPoint(x,y);if(!el||!svg.contains(el))return null;
  const tm=el.closest('.term');if(tm&&tm.getBoundingClientRect().height>=8)return {term:tm};
- const j=el.closest('.jump,.go');if(j){const r=j.getBoundingClientRect();if(r.height>=(j.classList.contains('jump')?14:10)&&BY[j.dataset.go])return {nav:BY[j.dataset.go]}}
+ const j=el.closest('.jump,.go');if(j&&!(j.classList.contains('obj')&&isAnc(BY[j.dataset.go],cur))){const r=j.getBoundingClientRect();if(r.height>=(j.classList.contains('jump')?14:10)&&BY[j.dataset.go])return {nav:BY[j.dataset.go],el:j.classList.contains('go')?j:null}}
  const ch=chainAt(cam.x+x/cam.k,cam.y+y/cam.k);let i=0;while(i<ch.length&&isAnc(ch[i],cur))i++;const t=ch[i];if(!t)return null;
  const sw=t.A.w*cam.k;return sw>=6?{unit:t}:null}
 function clickAt(x,y){const t=targetAt(x,y);setHover(null);if(!t)return;if(t.term)return setTimeout(()=>showTip(t.term),0);if(t.nav)return fly(t.nav);
  if(collapsed()){document.body.classList.remove('nc');try{localStorage.setItem('labNoteHidden','0')}catch(e){}FK=new Map()}fly(t.unit)}
 const kindWord={story:'challenge',problem:'problem',fix:'fix',result:'result'};
-function setHover(t,x,y){const n=t&&t.unit||null;svg.style.cursor=!t?'grab':t.term?'help':t.nav?'pointer':'zoom-in';
- if(n!==hovN){hovN=n;outl(hovEl,hovN,2)}
- if(n&&hov){const w=kindWord[n.kind]||'drawing';hovTip.textContent='Click: zoom into this '+w+' and read it in the note';hovTip.style.display='block';
+let hovObj=null;
+function outlObj(){if(!hovObj){return false}const r=hovObj.getBoundingClientRect(),p=6,f=v=>Math.round(v*10)/10;hovEl.setAttribute('d',`M${f(r.left-p)} ${f(r.top-p)}h${f(r.width+2*p)}v${f(r.height+2*p)}h${f(-r.width-2*p)}Z`);return true}
+function setHover(t,x,y){const ob=t&&t.el||null;const n=ob?null:(t&&t.unit||null);svg.style.cursor=!t?'grab':t.term?'help':ob?'zoom-in':t.nav?'pointer':'zoom-in';
+ if(ob!==hovObj){hovObj=ob;if(ob){hovN=null;outlObj()}else outl(hovEl,null,2)}
+ if(!ob&&n!==hovN){hovN=n;outl(hovEl,hovN,2)}
+ if(ob&&hov){hovTip.textContent=ob.dataset.name+': click or scroll to zoom in';hovTip.style.display='block';const tw=hovTip.offsetWidth;hovTip.style.left=Math.min(x+16,VW-tw-6)+'px';hovTip.style.top=Math.min(y+20,VH-30)+'px'}
+ else if(n&&hov){const w=kindWord[n.kind]||'drawing';hovTip.textContent=n.parent===TREE?n.title+': click or scroll to zoom in':'Click: zoom into this '+w+' and read it in the note';hovTip.style.display='block';
   const tw=hovTip.offsetWidth;hovTip.style.left=Math.min(x+16,VW-tw-6)+'px';hovTip.style.top=Math.min(y+20,VH-30)+'px'}else hovTip.style.display='none'}
 function end(e){if(!ptr.has(e.pointerId))return;ptr.delete(e.pointerId);svg.classList.remove('drag');
  if(ptr.size==0){if(!dragged&&e.type=='pointerup')clickAt(e.clientX,e.clientY);pinch=null;start=null}
@@ -570,7 +653,7 @@ function hideTip(){tip.style.display='none';tipOn=null}
 const hov=matchMedia('(hover:hover)').matches;
 document.addEventListener('mouseover',e=>{if(!hov)return;const t=e.target.closest&&e.target.closest('.term');if(t)showTip(t);else if(tipOn&&!e.target.closest('#tip'))hideTip()});
 document.addEventListener('click',e=>{const t=e.target.closest&&e.target.closest('.term');if(t){e.stopPropagation();tipOn===t?hideTip():showTip(t)}else if(!e.target.closest('#tip'))hideTip()});
-addEventListener('keydown',e=>{if(e.key=='Escape'){if(tipOn)return hideTip();cur.parent&&fly(cur.parent)}});
+addEventListener('keydown',e=>{if(e.key=='Escape'){if(tipOn)return hideTip();cur.parent&&fly(cur.parent)}else if(e.key=='Home'){if(tipOn)hideTip();fly(TREE)}});
 let rt=null;addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(()=>{const c=cur;VW=innerWidth;VH=innerHeight;build();cam=camFor(c);apply();setCur(c)},120)});
 /* ---------- go ---------- */
 try{if(localStorage.getItem('labNoteHidden')=='1')document.body.classList.add('nc')}catch(e){}
