@@ -417,7 +417,7 @@ function pr(id,o){const r=SPEC[o][id].r,p=papf(id,o);return {x:r[0],y:r[1],w:r[2
 function boxFor(id,o){const r=SPEC[o][id].r,p=papf(id,o),sc=r[2]/(p[2]-p[0]);return [r[0]-p[0]*sc,r[1]-p[1]*sc,1360*sc]}
 TREE.kids.forEach(c=>c.box={L:boxFor(c.id,'L'),P:boxFor(c.id,'P')});
 // tunnel curves (world units); hooks of the hanging label sit on them
-const TUN={L:[[851,255],[965,335],[1068,250]],P:[[640,943],[720,760],[538,712]]};
+const TUN={L:[[851,255],[965,335],[1068,250]],P:[[690,984],[730,760],[538,712]]};
 function qb(p,t){const u=1-t;return [u*u*p[0][0]+2*u*t*p[1][0]+t*t*p[2][0],u*u*p[0][1]+2*u*t*p[1][1]+t*t*p[2][1]]}
 function onTun(o,x){const p=TUN[o];let best=null;for(let i=0;i<=400;i++){const q=qb(p,i/400);if(!best||Math.abs(q[0]-x)<Math.abs(best[0]-x))best=q}return best}
 /* light sketch strokes that stay tiny on tiny objects */
@@ -454,8 +454,8 @@ function deco(id,o,X,Y,W,H){const s=STY[id],u=Math.min(W,H)/100,ink='#1e1e1e';le
  return [b,f]}
 function paperStroke(id){return {notice:['#6b6455',.004],hang:['#5c5647',.008],sticker:['#9775fa',.01],page:['#adb5bd',.004],screen:['#212529',.006],laptop:['#495057',.006],tag:['#b08a3e',.012]}[STY[id]]}
 function topDecor(o){const P=o=='P';let s=netDecor(o);const up=[];s=s.replace(/<text[\s\S]*?<\/text>/g,m=>{up.push(m);return ''});
- const B={L:{c1:[651,497],c2:[696,196],c3:[1160,798],c4:[567,471],c5:[922,303],c6:[840,518],c7:[1240,568],c8:[1061,409]},
-  P:{c1:[411,1205],c2:[723,1005],c3:[94,2028],c4:[341,1163],c5:[646,745],c6:[684,1305],c7:[343,238],c8:[367,442]}}[o];
+ const B={L:{c1:[669,497],c2:[696,181],c3:[1178,798],c4:[343,471],c5:[952,384],c6:[858,518],c7:[1258,568],c8:[1044,409]},
+  P:{c1:[438,1205],c2:[622,942],c3:[68,2028],c4:[101,1163],c5:[672,745],c6:[710,1305],c7:[317,238],c8:[342,393]}}[o];
  const H={L:{c1:['line',552,504,640,474],c4:['rect',378,458,172,118],c5:['tun'],c6:['rect',711,505,112,125]},
   P:{c1:['line',322,1204,420,1184],c4:['rect',148,1148,172,118],c5:['tun'],c6:['rect',603,1288,60,125]}}[o];
  const t=TUN[o];
@@ -469,41 +469,41 @@ function cylinder(cx,top,rx,ry,h,w){return `<path d="M${cx-rx} ${top}V${top+h}Q$
 function tunnel(o,w,dash){const t=TUN[o];return curve(`M${t[0][0]} ${t[0][1]}Q${t[1][0]} ${t[1][1]} ${t[2][0]} ${t[2][1]}`,C.green,w,dash)}
 function netDecor(o){let s='';const G=C.grey;
  if(o=='L'){
-  s+=T(40,60,'My SQL-injection lab',{s:40,b:1})+T(42,100,'The lab network, and the path a teacher uses to reach it from outside.',{s:22,c:G});
-  s+=lab(40,140,860,790,'')+`<text x="62" y="178" font-size="19" font-weight="700" fill="${C.blue}">The closed lab: four <tspan class="term" data-k="gns3">virtual computers</tspan> on the <tspan class="term" data-k="educloud">school\'s server</tspan>.</text><text x="62" y="202" font-size="19" font-weight="700" fill="${C.blue}">Only people with a <tspan class="term" data-k="vpn">school login</tspan> get in.</text>`;
-  s+=kaliPC(95,470,150)+person(170,440,52,C.ink,1)+NL(170,640,'Attacker','Kali','kali','The attacker\'s computer',{a:'middle'});
-  s+=bricks(380,460,3,4,42,28)+NL(464,615,'Firewall','pfSense','pfsense','Stands between\nthe two networks',{a:'middle'});
-  s+=NL(672,250,'Web server','Ubuntu-3','ubuntu-3','Runs the website',{a:'end'});
+  s+=T(40,60,'My SQL-injection lab',{s:40,b:1})+T(40,100,'The lab network, and the path a teacher uses to reach it from outside.',{s:22,c:G});
+  s+='<g data-draw="lab box">'+lab(40,140,860,790,'')+'</g>'+`<text x="62" y="178" font-size="19" font-weight="700" fill="${C.blue}">The closed lab: four <tspan class="term" data-k="gns3">virtual computers</tspan> on the <tspan class="term" data-k="educloud">school\'s server</tspan>.</text><text x="62" y="202" font-size="19" font-weight="700" fill="${C.blue}">Only people with a <tspan class="term" data-k="vpn">school login</tspan> get in.</text>`;
+  s+='<g data-draw="attacker PC">'+kaliPC(95,470,150)+person(170,440,52,C.ink,1)+'</g>'+NL(170,640,'Attacker','Kali','kali','The attacker\'s computer',{a:'middle'});
+  s+=bricks(380,460,3,4,42,28)+NL(464,624,'Firewall','pfSense','pfsense','Stands between\nthe two networks',{a:'middle'});
+  s+=NL(660,250,'Web server','Ubuntu-3','ubuntu-3','Runs the website',{a:'end'});
   s+=cylinder(767,525,56,16,100,4)+NL(767,672,'Database','Ubuntu-1','ubuntu-1','Stores the user list',{a:'middle'});
   s+=line(255,520,375,520,{w:5});
   s+=line(552,500,640,470,{w:4})+line(552,508,640,478,{w:4})+line(640,470,737,330,{w:4})+line(640,478,711,575,{w:4});
   s+=line(767,335,767,490,{c:C.purple,w:4,dash:'8 10'})+arrow(767,484,767,503,{c:C.purple,w:4,h:13})+T(780,410,'The website\nasks the\ndatabase.',{s:17,c:C.purple});
   s+=T(70,760,'The attacker\'s network',{s:16,c:G,b:1})+T(70,782,'LAN1',{s:16,c:G,term:'lan1'})+T(560,760,'The servers\' network',{s:16,c:G,b:1})+T(560,782,'LAN2',{s:16,c:G,term:'lan2'});
-  s+=cloudF(1180,235,230,22)+T(1305,214,'An outside\nservice that\npasses visitors\nthrough to the lab',{s:16,c:'#495057'});
-  s+=NL(1232,428,'Link page','GitHub Pages','github pages','A web page with\na link that\nnever changes');
-  s+=T(1148,668,"Teacher's laptop",{s:22,a:'middle',b:1});
-  s+=tunnel(o,6,'4 12')+arrow(1046,262,1068,250,{c:C.green,w:6,h:15})+T(842,180,'The web server opens the tunnel from inside.',{s:17,c:C.green,b:1});
-  s+=arrow(1148,553,1148,484,{w:5,h:15})+T(1133,512,'The teacher opens\nthe permanent link.',{s:17,c:G,a:'end'})+arrow(1150,382,1162,292,{w:5,h:15})+T(1138,332,'It forwards them\nto the tunnel.',{s:17,c:G,a:'end'});
-  s+=line(1000,820,925,820,{c:C.grey,w:3,dash:'5 6'})+arrow(930,820,906,820,{c:C.grey,w:3,h:11})+T(1068,900,'My own laptop',{s:21,a:'middle',b:1})+T(1068,922,'Connects into the lab',{s:16,a:'middle',c:'#495057'});
+  s+='<g data-draw="cloud">'+cloudF(1180,235,230,22)+'</g>'+T(1320,214,'An outside\nservice that\npasses visitors\nthrough to the lab',{s:16,c:'#495057'});
+  s+=NL(1240,428,'Link page','GitHub Pages','github pages','A web page with\na link that\nnever changes');
+  s+=T(1148,680,"Teacher's laptop",{s:22,a:'middle',b:1});
+  s+=tunnel(o,6,'4 12')+arrow(1046,262,1068,250,{c:C.green,w:6,h:15})+T(930,132,'The web server opens\nthe tunnel from inside.',{s:17,c:C.green,b:1});
+  s+=arrow(1148,553,1148,484,{w:5,h:15})+T(1050,500,'The teacher\nopens the\npermanent link.',{s:17,c:G,a:'end'})+arrow(1150,382,1162,292,{w:5,h:15})+T(1141,332,'It forwards them\nto the tunnel.',{s:17,c:G,a:'end'});
+  s+=line(1000,820,925,820,{c:C.grey,w:3,dash:'5 6'})+arrow(930,820,906,820,{c:C.grey,w:3,h:11})+T(1068,910,'My own laptop',{s:21,a:'middle',b:1})+T(1068,932,'Connects into the lab',{s:16,a:'middle',c:'#495057'});
  }else{
   s+=T(30,62,'My SQL-injection lab',{s:46,b:1})+T(30,108,'The lab network, and the path a teacher\nuses to reach it from outside.',{s:26,c:G});
-  s+=T(480,262,"Teacher's laptop",{s:28,b:1});
-  s+=arrow(420,352,420,410,{w:5,h:16})+T(392,378,'The teacher opens\nthe permanent link.',{s:19,c:G,a:'end'});
-  s+=T(480,470,'Link page',{s:28,b:1})+T(480,500,'GitHub Pages',{s:20,c:'#495057',term:'github pages'})+T(480,532,'A web page with\na link that\nnever changes',{s:20,c:'#495057'});
-  s+=arrow(420,597,420,642,{w:5,h:16})+T(392,618,'It forwards them\nto the tunnel.',{s:19,c:G,a:'end'});
-  s+=cloudF(420,700,240,28)+T(290,692,'An outside service\nthat passes visitors\nthrough to the lab',{s:19,c:'#495057',a:'end'});
-  s+=lab(40,850,720,1060,'');
-  s+=tunnel(o,7,'4 14')+arrow(556,716,538,712,{c:C.green,w:6,h:16})+T(565,800,'The web server opens\nthe tunnel from inside.',{s:21,c:C.green,b:1,a:'end'});
-  s+=NL(585,1000,'Web server','Ubuntu-3','ubuntu-3','Runs the website',{s:27,ss:20,a:'end'});
-  s+=cylinder(633,1300,28,9,105,3)+NL(752,1455,'Database','Ubuntu-1','ubuntu-1','Stores the user list',{s:27,ss:20,a:'end'});
-  s+=line(633,1135,633,1275,{c:C.purple,w:4,dash:'8 10'})+arrow(633,1270,633,1287,{c:C.purple,w:4,h:12})+T(648,1190,'The website\nasks the\ndatabase.',{s:18,c:C.purple});
-  s+=bricks(150,1150,3,4,42,28)+NL(130,1305,'Firewall','pfSense','pfsense','Stands between\nthe two networks',{s:27,ss:20});
-  s+=kaliPC(60,1560,150)+person(135,1530,52,C.ink,1)+NL(135,1740,'Attacker','Kali','kali','The attacker\'s computer',{a:'middle',s:27,ss:20});
+  s+=T(506,262,"Teacher's laptop",{s:28,b:1});
+  s+=arrow(420,352,420,410,{w:5,h:16})+T(294,378,'The teacher opens\nthe permanent link.',{s:19,c:G,a:'end'});
+  s+=T(500,470,'Link page',{s:28,b:1})+T(500,500,'GitHub Pages',{s:20,c:'#495057',term:'github pages'})+T(500,532,'A web page with\na link that\nnever changes',{s:20,c:'#495057'});
+  s+=arrow(420,597,420,642,{w:5,h:16})+T(358,582,'It forwards them\nto the tunnel.',{s:19,c:G,a:'end'});
+  s+='<g data-draw="cloud">'+cloudF(420,700,240,28)+'</g>'+T(268,692,'An outside service\nthat passes visitors\nthrough to the lab',{s:19,c:'#495057',a:'end'});
+  s+='<g data-draw="lab box">'+lab(40,850,720,1060,'')+'</g>';
+  s+=tunnel(o,7,'4 14')+arrow(556,716,538,712,{c:C.green,w:6,h:16})+T(545,900,'The web server opens\nthe tunnel from inside.',{s:21,c:C.green,b:1,a:'end'});
+  s+=NL(570,1000,'Web server','Ubuntu-3','ubuntu-3','Runs the website',{s:27,ss:20,a:'end'});
+  s+=cylinder(633,1300,28,9,105,3)+NL(730,1470,'Database','Ubuntu-1','ubuntu-1','Stores the user list',{s:27,ss:20,a:'end'});
+  s+=line(633,1135,633,1275,{c:C.purple,w:4,dash:'8 10'})+arrow(633,1270,633,1287,{c:C.purple,w:4,h:12})+T(646,1190,'The website\nasks the\ndatabase.',{s:16,c:C.purple});
+  s+=bricks(150,1150,3,4,42,28)+NL(130,1330,'Firewall','pfSense','pfsense','Stands between\nthe two networks',{s:27,ss:20});
+  s+='<g data-draw="attacker PC">'+kaliPC(60,1560,150)+person(135,1530,52,C.ink,1)+'</g>'+NL(165,1748,'Attacker','Kali','kali','The attacker\'s computer',{a:'middle',s:27,ss:20});
   s+=line(95,1553,95,1215,{w:5})+line(95,1215,146,1215,{w:5});
   s+=line(322,1200,420,1180,{w:4})+line(322,1208,420,1188,{w:4})+line(420,1180,606,1128,{w:4})+line(420,1188,605,1330,{w:4});
-  s+=T(300,1610,'The attacker\'s network',{s:22,c:G,b:1})+T(300,1636,'LAN1',{s:19,c:G,term:'lan1'})+T(480,1560,'The servers\' network',{s:22,c:G,b:1})+T(480,1586,'LAN2',{s:19,c:G,term:'lan2'});
-  s+=`<text x="62" y="1856" font-size="20" font-weight="700" fill="${C.blue}">The closed lab: four <tspan class="term" data-k="gns3">virtual computers</tspan> on the</text>`+`<text x="62" y="1882" font-size="20" font-weight="700" fill="${C.blue}"><tspan class="term" data-k="educloud">school\'s server</tspan>. Only people with a <tspan class="term" data-k="vpn">school login</tspan> get in.</text>`;
-  s+=line(171,1966,171,1930,{c:C.grey,w:3,dash:'5 6'})+arrow(171,1934,171,1913,{c:C.grey,w:3,h:12})+T(240,2030,'My own laptop',{s:27,b:1})+T(240,2062,'Connects into the lab',{s:20,c:'#495057'});
+  s+=T(300,1662,'The attacker\'s network',{s:22,c:G,b:1})+T(300,1688,'LAN1',{s:19,c:G,term:'lan1'})+T(480,1570,'The servers\' network',{s:22,c:G,b:1})+T(480,1596,'LAN2',{s:19,c:G,term:'lan2'});
+  s+=`<text x="62" y="1846" font-size="20" font-weight="700" fill="${C.blue}">The closed lab: four <tspan class="term" data-k="gns3">virtual computers</tspan> on the</text>`+`<text x="62" y="1872" font-size="20" font-weight="700" fill="${C.blue}"><tspan class="term" data-k="educloud">school\'s server</tspan>. Only people with a <tspan class="term" data-k="vpn">school login</tspan> get in.</text>`;
+  s+=line(171,1966,171,1930,{c:C.grey,w:3,dash:'5 6'})+arrow(171,1934,171,1913,{c:C.grey,w:3,h:12})+T(258,2030,'My own laptop',{s:27,b:1})+T(258,2062,'Connects into the lab',{s:20,c:'#495057'});
  }
  return s}
 
@@ -679,6 +679,6 @@ let rt=null;addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(()=>{c
 try{if(localStorage.getItem('labNoteHidden')=='1')document.body.classList.add('nc')}catch(e){}
 setTimeout(hide,9000);build();if(VW<=720)noteEl.classList.add('min');setCur(TREE);cam=camFor(TREE);apply();
 {const h0=location.hash.slice(1);if(BY[h0]&&h0!='lab'){hide();setCur(BY[h0]);cam=camFor(BY[h0]);flying=true;apply();flying=false}}
-window.__lab={cur:()=>cur.id,cam:()=>({...cam}),flying:()=>flying,fly:id=>fly(BY[id]),abs:id=>BY[id].A,mask:()=>+(maskEl.getAttribute("opacity")||0)*(maskEl.getAttribute("d")?1:0),kids:id=>(BY[id].kids||[]).map(k=>k.id),target:(x,y)=>{const t=targetAt(x,y);return !t?null:t.obj?'obj:'+t.obj.id:t.pic?'pic:'+t.pic.id:t.unit?'unit:'+t.unit.id:t.term?'term':'nav'},objRect:(id,f)=>objRect(BY[id],f),fa:()=>fitArea(),pan:(x,y)=>{cam.x+=x/cam.k;cam.y+=y/cam.k;apply()},hov:()=>hovT?(hovT.obj?'obj:'+hovT.obj.id:hovT.pic?'pic:'+hovT.pic.id:'unit:'+hovT.unit.id):null};
+window.__lab={cur:()=>cur.id,cam:()=>({...cam}),flying:()=>flying,fly:id=>fly(BY[id]),abs:id=>BY[id].A,mask:()=>+(maskEl.getAttribute("opacity")||0)*(maskEl.getAttribute("d")?1:0),kids:id=>(BY[id].kids||[]).map(k=>k.id),target:(x,y)=>{const t=targetAt(x,y);return !t?null:t.obj?'obj:'+t.obj.id:t.pic?'pic:'+t.pic.id:t.unit?'unit:'+t.unit.id:t.term?'term':'nav'},objRect:(id,f)=>objRect(BY[id],f),fa:()=>fitArea(),flyObj:id=>flyObj(BY[id]),pan:(x,y)=>{cam.x+=x/cam.k;cam.y+=y/cam.k;apply()},hov:()=>hovT?(hovT.obj?'obj:'+hovT.obj.id:hovT.pic?'pic:'+hovT.pic.id:'unit:'+hovT.unit.id):null};
 
 </script></body></html>
