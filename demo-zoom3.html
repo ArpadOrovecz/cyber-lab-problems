@@ -10,7 +10,7 @@
 :root{--ink:#1e1e1e;--paper:#fbfaf5;--red:#e03131;--green:#2f9e44;--blue:#1971c2;--orange:#f08c00;--hand:Hand,"Segoe Print","Comic Sans MS","Chalkboard SE","Marker Felt",cursive;--mono:ui-monospace,Consolas,"DejaVu Sans Mono",monospace}
 *{box-sizing:border-box}
 html,body{margin:0;height:100%;overflow:hidden;background:var(--paper);color:var(--ink);font-family:var(--hand);-webkit-tap-highlight-color:transparent}
-#cv,#bar,#hint,#notetab{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+#cv,#bar,#notetab{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
 #cv{position:fixed;inset:0;width:100vw;height:100vh;touch-action:none;cursor:grab;display:block;background-color:var(--paper);background-image:radial-gradient(#d9d5c7 1.2px,transparent 1.3px);background-size:26px 26px}
 #cv.drag,#cv.drag *{cursor:grabbing!important}
 #world{will-change:transform}
@@ -52,9 +52,9 @@ body.nc #note{display:none}body.nc #notetab{display:block}
 .term{border-bottom:2.5px dotted var(--blue);cursor:help;color:#0b4f8a}
 #tip{position:fixed;z-index:9;max-width:280px;background:#fff;border:2.5px solid var(--blue);border-radius:10px 14px 9px 13px;padding:8px 11px;font-size:16px;line-height:1.3;box-shadow:3px 4px 0 rgba(25,113,194,.25);display:none}
 #tip b{color:var(--blue)}
-#hint{position:fixed;left:50%;top:64px;transform:translateX(-50%) rotate(-1deg);background:#fff;border:2.5px solid var(--ink);border-radius:14px 10px 16px 9px;padding:8px 14px;font-size:18px;z-index:6;box-shadow:4px 4px 0 rgba(0,0,0,.15);text-align:center;transition:opacity .5s;max-width:92vw}
-#hint.gone{opacity:0;pointer-events:none}
-#hint kbd{font:13px var(--mono);border:1.5px solid #888;border-radius:4px;padding:0 4px}
+
+
+
 @media (max-width:720px){
  .btn{font-size:15px;padding:5px 9px}
  #home .t,#up .t{display:none}
@@ -66,7 +66,7 @@ body.nc #note{display:none}body.nc #notetab{display:block}
  #note.min .body>p:first-child{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
  #note .tog{display:inline-block;font:700 13px var(--hand);border:2px solid #d8c84a;background:#fff;border-radius:8px;padding:1px 8px;cursor:pointer;white-space:nowrap;color:#6b6450}
  #notetab{right:8px;bottom:8px}
- #hint{font-size:15px;top:auto;bottom:150px}
+ 
 }
 </style></head>
 <body>
@@ -413,7 +413,7 @@ const ROUTE={L:[
  [[700,652],[950,652],[950,680],[962,680]],
  [[975,632],[960,632],[960,450],[978,450]]]};
 const BRIDGE={L:[[400,262]]};
-function cardIn(o){return o=='L'?[505,444,24]:[280,1105,24]}
+function cardIn(o){return o=='L'?[494,446,17]:[263,1104,13]}
 TREE.kids=TREE.kids.filter(c=>c.id=='c4');TREE.kids[0].box={L:cardIn('L'),P:cardIn('P')};
 function rp(pts,r){let d=`M${pts[0][0]} ${pts[0][1]}`;for(let i=1;i<pts.length-1;i++){const [a,b,c]=[pts[i-1],pts[i],pts[i+1]];
  const l1=Math.hypot(b[0]-a[0],b[1]-a[1]),l2=Math.hypot(c[0]-b[0],c[1]-b[1]),q=Math.min(r,l1/2,l2/2);
@@ -429,7 +429,7 @@ function topDecor(o){const P=o=='P',off=OFF[o];let s=`<g transform="translate(${
   let hs=h[0]=='rect'?`<rect x="${h[1]}" y="${h[2]}" width="${h[3]}" height="${h[4]}" fill="#fff" fill-opacity=".001"/>`:h[0]=='line'?`<path d="M${h[1]} ${h[2]}L${h[3]} ${h[4]}" stroke="#fff" stroke-opacity=".001" stroke-width="34" fill="none"/>`:`<path d="${h[1]}" stroke="#fff" stroke-opacity=".001" stroke-width="34" fill="none"/>`;
   s+=`<g class="go${live?'':' soon'}" data-go="${live?id:''}" data-name="${c.title}">${hs}</g>`;
   s+=ell(q.b[0],q.b[1],R,R,{fill:C.blue,fo:1,c:C.blue,w:2})+T(q.b[0],q.b[1]+R*.42,String(c.num),{s:R*1.2,a:'middle',c:'#fff',b:1})}
- s+=`</g>`;{const [x,y,w]=cardIn(o),h=w*1110/1360;s+=`<g transform="rotate(-3 ${x+w/2} ${y+h/2})"><path d="M${x+1.1} ${y+1.6}L${x+w+1.3} ${y+1.3}L${x+w+1.0} ${y+h+1.5}L${x+0.8} ${y+h+1.2}Z" fill="#3a3226" fill-opacity=".22"/><path d="M${x+w+.4} ${y+2}l.8 .3l-.1 ${h-1}M${x+2} ${y+h+.4}l${w-1} .5" stroke="#1e1e1e" stroke-opacity=".35" stroke-width=".35" fill="none"/></g>`}return s}
+ s+=`</g>`;return s}
 
 function netDecor(o){let s='';const G=C.grey;
  if(o=='L'){
@@ -442,7 +442,7 @@ function netDecor(o){let s='';const G=C.grey;
   s+=line(268,485,338,485,{w:5})+line(440,436,565,345,{w:5})+line(495,540,592,600,{w:5});
   s+=line(650,442,650,530,{c:C.purple,w:4,dash:'8 10'})+arrow(650,524,650,548,{c:C.purple,w:4,h:14})+T(662,478,'The website\nasks the\ndatabase.',{s:17,c:C.purple});
   s+=T(110,742,'The attacker\'s network',{s:16,c:G,b:1})+T(110,764,'LAN1',{s:16,c:G,term:'lan1'})+T(520,764,'The servers\' network',{s:19,c:G,b:1})+T(712,764,'LAN2',{s:16,c:G,term:'lan2'});
-  s+=cloudF(1060,210,230,22)+T(1185,185,'Cloudflare',{s:22,b:1,term:'cloudflare'})+T(1185,212,'An outside service that\npasses visitors through\nto the lab',{s:17,c:'#495057'});s+=linkF(990,410,140)+NL(1145,438,'Link page','GitHub Pages','github pages','A web page with a link\nthat never changes');
+  s+=cloudF(1060,210,230,22)+T(1185,196,'An outside service that\npasses visitors through\nto the lab',{s:17,c:'#495057'});s+=linkF(990,410,140)+NL(1145,438,'Link page','GitHub Pages','github pages','A web page with a link\nthat never changes');
   s+=laptop2(1000,640,120)+T(1060,770,"Teacher's laptop",{s:22,a:'middle',b:1});
   s+=curve('M740 290 Q820 215 935 212',C.green,6,'4 12')+arrow(915,213,937,212,{c:C.green,w:6,h:16})+T(850,128,'The web server opens the tunnel from inside.',{s:17,c:C.green,b:1});
   s+=arrow(1060,630,1060,562,{w:5,h:16})+T(1078,592,'The teacher opens\nthe permanent link.',{s:17,c:G})+arrow(1060,400,1060,262,{w:5,h:16})+T(1078,320,'It forwards them\nto the tunnel.',{s:17,c:G});
@@ -450,11 +450,11 @@ function netDecor(o){let s='';const G=C.grey;
   s+=T(30,62,'My SQL-injection lab',{s:46,b:1})+T(30,108,'The lab network, and the path a teacher\nuses to reach it from outside.',{s:26,c:G});
   s+=laptop2(500,190,120)+T(560,320,"Teacher's laptop",{s:28,a:'middle',b:1});
   s+=linkF(490,390,140)+T(694,418,'Link page',{s:24,b:1})+T(694,446,'GitHub Pages',{s:19,c:'#495057',term:'github pages'})+T(694,478,'A web page\nwith a link\nthat never\nchanges',{s:19,c:'#495057'});
-  s+=cloudF(560,640,250,28)+T(425,605,'Cloudflare',{s:25,b:1,a:'end',term:'cloudflare'})+T(425,635,'An outside service\nthat passes visitors\nthrough to the lab',{s:19,c:'#495057',a:'end'});
-  s+=arrow(560,335,560,385,{w:5,h:16})+T(540,350,'The teacher opens\nthe permanent link.',{s:22,c:G,a:'end'})+arrow(560,548,560,590,{w:5,h:16})+T(540,560,'It forwards them\nto the tunnel.',{s:22,c:G,a:'end'});
+  s+=cloudF(560,640,250,28)+T(425,620,'An outside service\nthat passes visitors\nthrough to the lab',{s:19,c:'#495057',a:'end'});
+  s+=arrow(560,335,560,385,{w:5,h:16})+T(580,346,'The teacher opens\nthe permanent link.',{s:19,c:G})+arrow(560,548,560,590,{w:5,h:16})+T(528,536,'It forwards them\nto the tunnel.',{s:22,c:G,a:'end'});
   s+=lab(70,740,700,1220,'');s+=`<text x="95" y="1880" font-size="20" font-weight="700" fill="${C.blue}">The closed lab: four <tspan class="term" data-k="gns3">virtual computers</tspan> on the</text>`+`<text x="95" y="1904" font-size="20" font-weight="700" fill="${C.blue}"><tspan class="term" data-k="educloud">school\'s server</tspan>. Only people with a <tspan class="term" data-k="vpn">school login</tspan> get in.</text>`+`<text x="95" y="1948.75" font-size="15" fill="#868e96">virtual network) · <tspan class="term" data-k="vpn">VPN</tspan> (the school login)</text>`;
-  s+=curve('M560 795 L560 700',C.green,7,'4 14')+arrow(560,712,560,690,{c:C.green,w:6,h:18})+T(540,715,'The web server opens\nthe tunnel from inside.',{s:22,c:C.green,b:1,a:'end'});
-  s+=websrv(475,800,170)+NL(560,955,'Web server','Ubuntu-3','ubuntu-3','Runs the website',{a:'middle',s:27,ss:20});
+  s+=curve('M560 795 L560 700',C.green,7,'4 14')+arrow(560,712,560,690,{c:C.green,w:6,h:18})+T(530,704,'The web server opens\nthe tunnel from inside.',{s:22,c:C.green,b:1,a:'end'});
+  s+=websrv(475,800,170)+NL(478,955,'Web server','Ubuntu-3','ubuntu-3','Runs the website',{s:27,ss:20});
   s+=dbi(560,1240,110)+NL(560,1385,'Database','Ubuntu-1','ubuntu-1','Stores the user list',{a:'middle',s:27,ss:20});
   s+=line(560,1005,560,1205,{c:C.purple,w:4,dash:'8 10'})+arrow(560,1198,560,1224,{c:C.purple,w:4,h:16})+T(575,1085,'The website\nasks the\ndatabase.',{s:22,c:C.purple});
   s+=bricks(160,1100,3,4,42,28)+NL(235,1255,'Firewall','pfSense','pfsense','Stands between\nthe two networks',{a:'middle',s:27,ss:20});
@@ -476,8 +476,8 @@ function renderFrame(n){let s=n.decor?n.decor(oF(n)):'';(n.kids||[]).forEach(k=>
 /* level of detail: a node's own fine drawing (.in) fades in as the node grows on screen; its outline/panel (.sk) and, for challenges, its zones stay */
 const LOD={story:[260,460],problem:[70,150],fix:[70,150],result:[70,150]},LODd=[110,220];
 function renderNode(k){const b=bx(k),f=fr(k),sc=b.w/f[0];seed=k.id.length*977+Math.round(b.x)+7;k.lod=LOD[k.kind]&&!k.deep?LOD[k.kind]:LODd;
- let s=`<g class="node" data-id="${k.id}" transform="${k.id===ROT.id?`rotate(${ROT.deg} ${b.x+b.w/2} ${b.y+b.h/2}) `:''}translate(${b.x} ${b.y}) scale(${sc})">`;
- s+=k.flat?`<rect width="${f[0]}" height="${f[1]}" fill="#fff" fill-opacity=".001"/>`:`<rect width="${f[0]}" height="${f[1]}" rx="${f[0]*.012}" fill="#fffef8" stroke="${k.num?'#6b6455':KC[k.kind]}" stroke-width="${k.num?4:7}"/>`+(k.num?`<path d="M548 -38L812 -30L806 22L544 14Z" fill="#f4e3a1" fill-opacity=".85" stroke="#c9b46a" stroke-width="3"/>`:'');
+ let s=`<g class="node" data-id="${k.id}" transform="${k.id===ROT.id?`rotate(${RD} ${b.x+b.w/2} ${b.y+b.h/2}) `:''}translate(${b.x} ${b.y}) scale(${sc})">`;
+ s+=k.flat?`<rect width="${f[0]}" height="${f[1]}" fill="#fff" fill-opacity=".001"/>`:`<rect width="${f[0]}" height="${f[1]}" rx="${f[0]*.012}" fill="#fffef8" stroke="${k.num?'#6b6455':KC[k.kind]}" stroke-width="${k.num?4:7}"/>`;if(k.id===ROT.id)s=s.replace(/<rect width[^>]*\/>$/,`<path id="c4sh" fill="#3a3226" fill-opacity=".22"/><rect id="c4paper" fill="#fffef8" stroke="#6b6455" stroke-width="4"/><path id="c4edge" stroke="#1e1e1e" stroke-opacity=".35" stroke-width="10" fill="none"/><path id="c4tape" fill="#f4e3a1" fill-opacity=".85" stroke="#c9b46a" stroke-width="3"/>`);
  if(k.flat){seed=k.id.length*977+3;s+=`<g class="sk">${_zb(k.kind)}</g>`}
  NOZB=!!k.flat;const dec=k.decor?k.decor(oF(k)):'';NOZB=false;let kids='';(k.kids||[]).forEach(x=>kids+=renderNode(x));
  s+=k.num?`<g class="in">${dec}</g>${kids}</g>`:`<g class="in">${dec}${kids}</g></g>`;
@@ -485,17 +485,17 @@ function renderNode(k){const b=bx(k),f=fr(k),sc=b.w/f[0];seed=k.id.length*977+Ma
 const selEl=document.getElementById('sel'),hovEl=document.getElementById('hov'),hovTip=document.getElementById('hovtip');let hovN=null;
 const world=document.getElementById('world'),svg=document.getElementById('cv'),maskEl=document.getElementById('mask'),noteEl=document.getElementById('note');
 function abs(n){if(!n.parent){const f=fr(n);return {x:0,y:0,w:f[0],h:f[1]}}const P=n.parent.A,k=P.w/fr(n.parent)[0],b=bx(n);return {x:P.x+b.x*k,y:P.y+b.y*k,w:b.w*k,h:b.h*k}}
-const ROT={id:'c4',deg:-3};let RC=[0,0];const RA=ROT.deg*Math.PI/180,RCS=Math.cos(RA),RSN=Math.sin(RA);
+const ROT={id:'c4',deg:-3};let RC=[0,0];let RD=ROT.deg,RCS=Math.cos(RD*Math.PI/180),RSN=Math.sin(RD*Math.PI/180);let RB='';
 const rv=p=>{const dx=p[0]-RC[0],dy=p[1]-RC[1];return [RC[0]+dx*RCS-dy*RSN,RC[1]+dx*RSN+dy*RCS]},ri=p=>{const dx=p[0]-RC[0],dy=p[1]-RC[1];return [RC[0]+dx*RCS+dy*RSN,RC[1]-dx*RSN+dy*RCS]};
 const corners=A=>[[A.x,A.y],[A.x+A.w,A.y],[A.x+A.w,A.y+A.h],[A.x,A.y+A.h]];
 function build(){O=innerWidth<innerHeight*0.9?'P':'L';world.innerHTML=renderFrame(TREE);
- TREE.A=abs(TREE);NODES.forEach(n=>{n.A=abs(n);n.g=world.querySelector(`.node[data-id="${n.id}"]`);n.inG=n.g.querySelector(':scope>.in');n.vis=1;n.det=1;n.op=1});const r=BY[ROT.id];RC=[r.A.x+r.A.w/2,r.A.y+r.A.h/2];NODES.forEach(n=>{let q=n;n.rot=false;for(;q;q=q.parent)if(q===r)n.rot=true});FK=new Map()}
+ TREE.A=abs(TREE);NODES.forEach(n=>{n.A=abs(n);n.g=world.querySelector(`.node[data-id="${n.id}"]`);n.inG=n.g.querySelector(':scope>.in');n.vis=1;n.det=1;n.op=1});paper();const r=BY[ROT.id];RB='';RD=ROT.deg;RC=[r.A.x+r.A.w/2,r.A.y+r.A.h/2];NODES.forEach(n=>{let q=n;n.rot=false;for(;q;q=q.parent)if(q===r)n.rot=true});FK=new Map()}
 /* ---------- camera: screen = (world - cam) * k ---------- */
 let cam={x:0,y:0,k:1},VW=innerWidth,VH=innerHeight,anim=null,cur=TREE,flying=false,FK=new Map();
 const ph=()=>VW<=720,collapsed=()=>document.body.classList.contains('nc');
 function fitArea(){if(ph()){const nh=collapsed()?44:noteEl.offsetHeight+16;return {x:8,y:58,w:VW-16,h:Math.max(120,VH-58-nh)}}
  return {x:16,y:62,w:VW-32-(!collapsed()&&VW>900?360:0),h:VH-78}}
-function camFor(n){let a=n.A;const F=fitArea();if(n.rot){const c=corners(a).map(rv),xs=c.map(p=>p[0]),ys=c.map(p=>p[1]),x0=Math.min(...xs),y0=Math.min(...ys);a={x:x0,y:y0,w:Math.max(...xs)-x0,h:Math.max(...ys)-y0}}
+function camFor(n){let a=n.A;const F=fitArea();if(false){const c=corners(a).map(rv),xs=c.map(p=>p[0]),ys=c.map(p=>p[1]),x0=Math.min(...xs),y0=Math.min(...ys);a={x:x0,y:y0,w:Math.max(...xs)-x0,h:Math.max(...ys)-y0}}
  if(n.fitW&&n.fitW[O]){const k=F.w/(a.w*1.03);if(a.h*k<=F.h)return {k,x:a.x+a.w/2-(F.x+F.w/2)/k,y:a.y+a.h/2-(F.y+F.h/2)/k};return {k,x:a.x+a.w/2-(F.x+F.w/2)/k,y:a.y-(F.y+6)/k}}
  const pad=n.parent?1.04:1.02,k=Math.min(F.w/(a.w*pad),F.h/(a.h*pad));return {k,x:a.x+a.w/2-(F.x+F.w/2)/k,y:a.y+a.h/2-(F.y+F.h/2)/k}}
 function fitK(n){let v=FK.get(n);if(v===undefined){v=camFor(n).k;FK.set(n,v)}return v}
@@ -504,7 +504,15 @@ function center(){const F=fitArea();return [cam.x+(F.x+F.w/2)/cam.k,cam.y+(F.y+F
 function inside(n,m,c){const A=n.A;c=c||center();if(n.rot)c=ri(c);return c[0]>=A.x-A.w*m&&c[0]<=A.x+A.w*(1+m)&&c[1]>=A.y-A.h*m&&c[1]<=A.y+A.h*(1+m)}
 const sm=t=>t<=0?0:t>=1?1:t*t*(3-2*t);
 function outl(el,n,pad){if(!n||!n.parent){el.setAttribute('d','');return}if(n.rot){const A=n.A,pw=pad/cam.k,c=corners({x:A.x-pw,y:A.y-pw,w:A.w+2*pw,h:A.h+2*pw}).map(rv).map(p=>[(p[0]-cam.x)*cam.k,(p[1]-cam.y)*cam.k]),f=v=>Math.round(v*10)/10;el.setAttribute('d','M'+c.map(p=>f(p[0])+' '+f(p[1])).join('L')+'Z');return}const A=n.A,K=cam.k,x=(A.x-cam.x)*K-pad,y=(A.y-cam.y)*K-pad,w=A.w*K+2*pad,h=A.h*K+2*pad,f=v=>Math.round(v*10)/10;el.setAttribute('d',`M${f(x)} ${f(y)}h${f(w)}v${f(h)}h${f(-w)}Z`)}
-function apply(){const k=cam.k;world.setAttribute('transform',`matrix(${k} 0 0 ${k} ${-cam.x*k} ${-cam.y*k})`);cull();mask();outl(selEl,cur,4);if(!outlObj())outl(hovEl,hovN,2);if(!flying)autoCur()}
+function paper(){const r=BY[ROT.id];if(!r)return;const f=fr(r),A=r.A,sc=A.w/f[0],c=camFor(r),q=v=>Math.round(v*10)/10;
+ let x0=(c.x-A.x)/sc,y0=(c.y-A.y)/sc,x1=x0+VW/c.k/sc,y1=y0+VH/c.k/sc;const m=.015*(x1-x0);x0=Math.min(0,x0-m);y0=Math.min(0,y0-m);x1=Math.max(f[0],x1+m);y1=Math.max(f[1],y1+m);const w=x1-x0,h=y1-y0,o=1.3/sc,$=id=>document.getElementById(id);
+ const P=$('c4paper');P.setAttribute('x',q(x0));P.setAttribute('y',q(y0));P.setAttribute('width',q(w));P.setAttribute('height',q(h));P.setAttribute('rx',q(w*.01));
+ $('c4sh').setAttribute('d',`M${q(x0+o*.8)} ${q(y0+o*1.2)}L${q(x1+o)} ${q(y0+o)}L${q(x1+o*.8)} ${q(y1+o*1.15)}L${q(x0+o*.6)} ${q(y1+o*.9)}Z`);
+ $('c4edge').setAttribute('d',`M${q(x1+o*.3)} ${q(y0+o*1.5)}l${q(o*.6)} ${q(o*.2)}l${q(-o*.1)} ${q(h-o)}M${q(x0+o*1.5)} ${q(y1+o*.3)}l${q(w-o)} ${q(o*.4)}`);
+ const cx=(x0+x1)/2,tw=w*.19;$('c4tape').setAttribute('d',`M${q(cx-tw/2)} ${q(y0-38)}L${q(cx+tw/2)} ${q(y0-30)}L${q(cx+tw/2-6)} ${q(y0+22)}L${q(cx-tw/2-4)} ${q(y0+14)}Z`)}
+function tilt(){const r=BY[ROT.id];if(!r||!r.g)return;const k0=fitK(TREE),k1=fitK(r);let p=Math.log(cam.k/k0)/Math.log(k1/k0);p=Math.max(0,Math.min(1,p));p=p*p*(3-2*p);const d=ROT.deg*(1-p);if(Math.abs(d-RD)<1e-4&&RB)return;RD=d;RCS=Math.cos(d*Math.PI/180);RSN=Math.sin(d*Math.PI/180);
+ if(!RB)RB=r.g.getAttribute('transform').replace(/^rotate\([^)]*\)\s*/,'');r.g.setAttribute('transform',`rotate(${Math.round(d*1e4)/1e4} ${RC[0]} ${RC[1]}) `+RB);}
+function apply(){const k=cam.k;tilt();world.setAttribute('transform',`matrix(${k} 0 0 ${k} ${-cam.x*k} ${-cam.y*k})`);cull();mask();outl(selEl,cur,4);if(!outlObj())outl(hovEl,hovN,2);if(!flying)autoCur()}
 function cull(){const k=cam.k;for(const n of NODES){const A=n.A,sx=(A.x-cam.x)*k,sy=(A.y-cam.y)*k,sw=A.w*k,sh=A.h*k;
  /* demo2: no off-screen culling either */
  /* demo2: no level-of-detail fades: everything is always drawn */
